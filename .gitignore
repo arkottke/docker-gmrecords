@@ -1,0 +1,4 @@
+# Components of the build
+gmprocess/
+environment.yml
+parallel_*_all.deb
