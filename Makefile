@@ -25,16 +25,11 @@ prereqs-env:
 	conda env export > environment.yml
 	conda deactivate
 
-prereqs-parallel: 
-	# Download the parallel package
-	# $(BROWSER) "https://download.opensuse.org/repositories/home:/tange/xUbuntu_18.10/all/"
-	wget https://download.opensuse.org/repositories/home:/tange/xUbuntu_18.10/all/parallel_20210522_all.deb
-
-build: gmprocess/ environment.yml parallel_20210522_all.deb
+build: pull prereqs-env
 	docker build . -t gmrecords
 
 run: build
-	docker run -it --rm -v /mnt/hdd/dsgmd:/app/working gmrecords /bin/bash
+	docker run -it --rm -v $(pwd)/data:/working -t gmrecords
 
 push: build
 	docker tag gmrecords arkottke/gmrecords
