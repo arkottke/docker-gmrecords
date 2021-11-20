@@ -1,89 +1,63 @@
 # -----------------------------------------------------------------------------
 # This section is for configuring data fetching routines.
 fetchers:
-  KNETFetcher:
-        # NIED requires a username and a password, obtain these by
-        # visiting this page:
-        # https://hinetwww11.bosai.go.jp/nied/registration/
-    user: USERNAME
-    password: PASSWORD
-        # define the distance search radius (km)
-    radius: 100
-        # define the time search threshold (sec)
-    dt: 60
-        # define the depth search threshold (km)
-    ddepth: 30
-        # define the magnitude search threshold (km)
-    dmag: 0.3
-        # restrict the number of processed stations by
-        # using magnitude to set maximum station distance
-    restrict_stations: false
-  CESMDFetcher:
+    CESMDFetcher:
         # CESMD requires an email, register yours by
         # visiting this page:
         # https://strongmotioncenter.org/cgi-bin/CESMD/register.pl
-    email: EMAIL
-    process_type: raw
-    station_type: Ground
+        email: albert.kottke@gmail.com
+        process_type: raw
+        station_type: Ground
         # define the distance search radius (km)
-    eq_radius: 10
+        eq_radius : 10
         # define the time search threshokd (sec)
-    eq_dt: 10
+        eq_dt : 10
         # station search radius (km)
-    station_radius: CESMD_RADIUS_KM
-  TurkeyFetcher:
-        # define the distance search radius (km)
-    radius: 100
-        # define the time search threshold (sec)
-    dt: 16
-        # define the depth search threshold (km)
-    ddepth: 30
-        # define the magnitude search threshold (km)
-    dmag: 0.3
-  FDSNFetcher:
-        # search radius in decimal degrees
-    radius: 4
+        station_radius: 300
+    FDSNFetcher:
+        # search radius in decimal degrees. 3 provides about 300 km
+        radius : 3
         # seconds before arrival time
-    time_before: 30
+        time_before : 30
         # seconds after arrival time
-    time_after: 420
-    channels: ["BH?", "HH?", "BN?", "HN?"]      # only get strong motion and high-gain channels
+        time_after : 420
+        channels : ["BH?", "HH?", "BN?", "HN?"] # only get strong motion and high-gain channels
         # channels : ["?N?"] # only get strong motion/broadband accelerometer data
 
         # List instruments that should be avoided.
         # '?' and '*' wildcards are permissible.
-    exclude_patterns: ['*.*.??.LN?']
+        exclude_patterns : ['*.*.??.LN?']
 
-    network: "*"
+        network : "*"
 
         # SY is a network for synthetic data
-    exclude_networks:
-    - SY
-    - ZY
-    - YH
-    - YG
-    - AM
+        exclude_networks :
+            - SY
+            - ZY
+            - YH
+            - YG
+            - AM
 
         # uncomment this section to add stations that should be avoided
         # exclude_stations:
         #    - ABC*
 
         # If True (default), MiniSEED files with gaps and/or overlaps will be rejected.
-    reject_channels_with_gaps: true
+        reject_channels_with_gaps : True
 
         # The minimum length of the data as a fraction of the requested time frame.
         # After a channel has been downloaded it will be checked that its total
         # length is at least that fraction of the requested time span.
         # Will be rejected otherwise. Must be between 0.0 and 1.0.
-    minimum_length: 0.1
+        minimum_length : 0.1
 
         # Only download data that has accompanying StationXML metadata.
-    sanitize: true
+        sanitize : True
 
         # The minimum inter-station distance.
         # Data from any new station closer to any
         # existing station will not be downloaded.
-    minimum_interstation_distance_in_m: 0.0
+        minimum_interstation_distance_in_m: 0.0
 
         # For each of the FDSN providers, a username and password
         # can be provided. This section does not need to contain all of the
@@ -101,10 +75,10 @@ read:
     # Look for StationXML files in this directory instead of the `<event>/raw`
     # directory. StationXML file names must follow the convension of 
     # `<network>.<station>.xml`.
-  metadata_directory: None
+    metadata_directory: None
 
     # Resampling rate if times are unevenly spaced
-  resample_rate: 200
+    resample_rate: 200
 
     # SAC header doesn't include units (!) and is generally assumed to be:
     #     nm/s/s for acceleration
@@ -112,13 +86,13 @@ read:
     #     nm     for displacement
     # The following is a multiplicative factor to convert the ACTUAL data the
     # SAC files being used to cm/s/s for accel or cm/s for velocity.
-  sac_conversion_factor: 1e-7        # For nm/s/s
+    sac_conversion_factor: 1e-7      # For nm/s/s
     # sac_conversion_factor: 1e-4    # For um/s/s
     # sac_conversion_factor: 980.665 # For g
 
     # Also, data source is not included in SAC headers, so we provide an option
     # to set it here:
-  sac_source: Unknown
+    sac_source: Unknown
 
 # -----------------------------------------------------------------------------
 # Options for separating noise/signal windows
@@ -134,30 +108,30 @@ read:
 
 windows:
 
-  signal_end:
+    signal_end:
         # The end of the signal can be set using a phase velocity.
         # Alternatively, it can be set with duration model, where the mean
         # 5-95% significant duration (Ds) is added to the split time. The mean
         # Ds can also be extended by a number of standard deviations (epsilon).
 
         # Valid options for "method" are "velocity" and "model"
-    method: model
-    vmin: 1.0
+        method: model
+        vmin: 1.0
         # Minimum duration in sec for use with 'vmin' option.
-    floor: 120
+        floor: 120
         # Duration model
-    model: AS16
+        model: AS16
         # Number of standard deviations; if epsilon is 1.0, then the signal
         # window duration is the mean Ds + 1 standard deviation.
-    epsilon: 3.0
+        epsilon: 3.0
 
-  window_checks:
+    window_checks:
         # Minimum noise duration; can be zero but this will allow for errors
         # to occur if requesting signal-to-noise ratios.
-    do_check: true
-    min_noise_duration: 1.0
+        do_check: True
+        min_noise_duration: 1.0
 
-    min_signal_duration: 5.0
+        min_signal_duration: 5.0
 
 
 # -----------------------------------------------------------------------------
@@ -167,8 +141,8 @@ processing:
 
     # Check to keep or ignore non-free-field sensors. Typically, these include
     # sensors attached to a large structure (buildings, dams, bridges, etc.)
-- check_free_field:
-    reject_non_free_field: true
+    - check_free_field:
+        reject_non_free_field: True
 
     # Amplitude check to avoid clipping. Units are usually counts (e.g., with
     # data from IRIS) but some sources will convert to physical units so it
@@ -179,33 +153,33 @@ processing:
 
     # Check number of traces for each instrument. Max is useful for screening
     # out downhole or structural arrays with the same station code.
-- check_instrument:
-    n_max: 3
-    n_min: 2
-    require_two_horiz: true
+    - check_instrument:
+        n_max: 3
+        n_min: 2
+        require_two_horiz: True
 
     # Require a minimum sample rate
-- min_sample_rate:
-    min_sps: 20.0
+    - min_sample_rate:
+        min_sps: 20.0
 
     # Check for clipping
-- check_clipping:
+    - check_clipping:
         # Threshold probability for clipping detection.
-    threshold: 0.2
+        threshold: 0.2
 
-- detrend:
+    - detrend:
         # Supported obspy methods:
         #     constant, demean, linear, polynomial, simple, spline
         # Also:
         #     baseline_sixth_order, pre
-    detrending_method: linear
+        detrending_method: linear
 
-- detrend:
-    detrending_method: demean
+    - detrend:
+        detrending_method: demean
 
-- check_zero_crossings:
+    - check_zero_crossings:
         # Require a minimum number of zero crossings per second.
-    min_crossings: 0.1
+        min_crossings: 0.1
 
     # STA/LTA is computed for record and the max value must exceed the threshold
     # below. Units are sec for window lenghts.
@@ -214,42 +188,42 @@ processing:
     #     lta_length: 20.0
     #     threshold: 3.0
 
-- remove_response:
+    - remove_response:
         # Pre-filtering frequencies. See obspy.core.trace.Trace.remove_response
         # for details. Note: if f3 is Null it will be set to 0.9*fn, if f4 is
         # Null it will be set to fn.
-    f1: 0.001
-    f2: 0.005
-    f3:
-    f4:
+        f1: 0.001
+        f2: 0.005
+        f3: Null
+        f4: Null
 
         # Water level (dB) for deconvolution
-    water_level: 60
+        water_level: 60
 
-- detrend:
-    detrending_method: linear
+    - detrend:
+        detrending_method: linear
 
-- detrend:
-    detrending_method: demean
+    - detrend:
+        detrending_method: demean
 
-- compute_snr:
+    - compute_snr:
         # Presense of this check says to do the signa-to-noise ratio check.
         # Requires minimum SNR of `threshold` between `min_freq` and `max_freq`
         # using Konno-Omachi smoothed spectra with `bandwidth` parameter.
-    bandwidth: 20.0
-    check:
-      threshold: 3.0
-      min_freq: 'f0'        # Either a float or 'f0'. If 'f0', then the Brune
+        bandwidth: 20.0
+        check:
+            threshold: 3.0
+            min_freq: 'f0'  # Either a float or 'f0'. If 'f0', then the Brune
             # corner frequency of the earthquake will be used as the minimum
             # frequency for the SNR check.
-      max_freq: 5.0
-      f0_options:
-        stress_drop: 10          # bars
-        shear_vel: 3.7           # km/s
-        ceiling: 2.0             # Hz. If the computed f0 is greater than
+            max_freq: 5.0
+            f0_options:
+                stress_drop: 10  # bars
+                shear_vel: 3.7   # km/s
+                ceiling: 2.0     # Hz. If the computed f0 is greater than
                 # ceiling, then the ceiling frequency will be used. This should
                 # be less than max_freq.
-        floor: 0.1               # Hz. If the computed f0 is less than the
+                floor: 0.1       # Hz. If the computed f0 is less than the
                 # floor, then the floor frequency will be used.
 
     # - NNet_QA:
@@ -257,26 +231,26 @@ processing:
     #     acceptance_threshold: 0.5
     #     model_name: CantWell
 
-- get_corner_frequencies:
+    - get_corner_frequencies:
         # Corner frequency selection can use constant values, or selected
         # dynamically from the signal-to-noise-ratio.
 
         # Valid options for "method" are "constant" and "snr".
-    method: snr
+        method: snr
 
-    constant:
-      highpass: 0.08
-      lowpass: 20.0
+        constant:
+            highpass: 0.08
+            lowpass: 20.0
 
-    snr:
+        snr:
             # For dynamic filtering, we require a minimum SNR threshold between
             # as configured in the snr_check step.
-      same_horiz: true
+            same_horiz: True
 
     # Apply a cap to the lowpass corner frequency so that it is guaranteed to be
     # less than or equal to fn_fac * fn, where fn is the Nyquist frequency
-- lowpass_max_frequency:
-    fn_fac: 0.75
+    - lowpass_max_frequency:
+        fn_fac: 0.75
 
     # - adjust_highpass_corner:
     #     # Options for further refinement of the highpass corner. Currently, this
@@ -318,7 +292,7 @@ processing:
     #       # quality.
     #       a: 50
 
-- cut:
+    - cut:
         # No required options; the presence of this step just indicates when to
         # cut the time series using the record start and signal end that were
         # configured in the windows section.
@@ -327,34 +301,34 @@ processing:
         # time of the signal window (relative to the estimated p-wave arrival). 
         # If set to "Null" then the beginning of the signal window will be
         # unchanged.
-    sec_before_split: 2.0
+        sec_before_split: 2.0
 
-- taper:
+    - taper:
         # Taper to apply to trace.
-    type: hann
-    width: 0.05
-    side: both
+        type: hann
+        width: 0.05
+        side: both
 
-- highpass_filter:
+    - highpass_filter:
         # Applies a Butterworth highpass filter using the highpass corner
         # determined with 'corner_frequencies' section.
-    filter_order: 5
-    number_of_passes: 2
+        filter_order: 5
+        number_of_passes: 2
 
-- lowpass_filter:
+    - lowpass_filter:
         # Applies a Butterworth lowpass filter using the lowpass corner
         # determined with 'corner_frequencies' section.
-    filter_order: 5
-    number_of_passes: 2
-- detrend:
-    detrending_method: pre
+        filter_order: 5
+        number_of_passes: 2
+    - detrend:    
+        detrending_method: pre
 
-- detrend:
+    - detrend:
     #     # The current baseline correction method fits a sixth-order polynomial
     #     # to the displacement time series, and sets the zeroth- and first-order
     #     # terms to be zero. The second derivative of the fit polynomial is then
     #     # removed from the acceleration time series.
-    detrending_method: baseline_sixth_order
+        detrending_method: baseline_sixth_order
 
     # - trim_multiple_events:
     #     pga_factor: 0.2
@@ -365,54 +339,54 @@ processing:
     #     rupture_parameters:
     #         rake: 0
 
-- fit_spectra:
+    - fit_spectra:
         # Fit a Brune spectra by optimizing moment and corner frequency.
         # Note that it only uses frequencies between the corner frequencies
         # that are selected based on the options in the 'get_corner_frequencies'
         # section of this config file.
 
         # Kappa (sec)
-    kappa: 0.035
+        kappa: 0.035
 
         # Radiation pattern factor (Boore and Boatwright, 1984))
-    RP: 0.55
+        RP: 0.55
 
         # Partition of shear-wave energy into horizontal components
         # 1 / np.sqrt(2.0)
-    VHC: 0.7071068
+        VHC: 0.7071068
 
         # Free surface effect
-    FSE: 2.0
+        FSE: 2.0
 
         # Density at source (gm/cc)
-    density: 2.8
+        density: 2.8
 
         # Shear-wave velocity at source (km/s)
-    shear_vel: 3.7
+        shear_vel: 3.7
 
         # Reference distance (km)
-    R0: 1.0
+        R0: 1.0
 
         # Multiplicative factor for setting bounds on moment, where the
         # moment (from the catalog moment magnitude) is multiplied and
         # divided by `moment_factor` to set the bounds for the spectral
         # optimization.
-    moment_factor: 100
+        moment_factor: 100
 
         # Min stress for fit search (bars)
-    min_stress: 0.1
+        min_stress: 0.1
 
         # Max stress for fit search (bars)
-    max_stress: 10000
+        max_stress: 10000
 
-- check_tail:
+    - check_tail:
         # Tail duration in sec
-    duration: 5.0
+        duration: 5.0
         # Max ratio of the absolute velocity in the tail to the full trace.
-    max_vel_ratio: 0.3
+        max_vel_ratio: 0.3
         # Max ratio of the absolute displacement in the tail to the full 
         # trace.
-    max_dis_ratio: 0.6
+        max_dis_ratio: 0.6
 
 colocated:
     # This section is for handling colocated instruments that have otherwise
@@ -427,7 +401,7 @@ colocated:
     # clipping detection algorithm, it probably makes sense to change the
     # preference to high gain seismometers.
 
-  preference: ["HN?", "BN?", "HH?", "BH?"]
+    preference: ["HN?", "BN?", "HH?", "BH?"]
 
 # travel_time:
 #     # Section for computing travel times which is used by the
@@ -442,17 +416,17 @@ duplicate:
     # This section is for handling duplicate data when creating a StreamCollection
 
     # Maximum distance tolerance (in m) for duplicate data
-  max_dist_tolerance: 500
+    max_dist_tolerance: 500
 
     # List of preferences (in order) for handling duplicate data.
-  preference_order: ['process_level', 'source_format', 'starttime', 'npts', 'sampling_rate',
-    'location_code']
+    preference_order: ['process_level', 'source_format', 'starttime', 'npts',
+                       'sampling_rate', 'location_code']
 
     # Preference for selecting process level when faced with duplicate data
     # but with different processing levels. Must be a list containing
     # 'V0', 'V1', and 'V2'. The first item is the most preferred,
     # and the last item is the least preferred.
-  process_level_preference: ['V1', 'V0', 'V2']
+    process_level_preference: ['V1', 'V0', 'V2']
 
     # Preference for selecting the format when faced with duplicate data
     # but with different source formats. Must be a list containing the source
@@ -460,7 +434,7 @@ duplicate:
     # all possible formats.
 
     # Example to always prefer COSMOS files over DMG files
-  format_preference: ['cosmos', 'dmg']
+    format_preference: ['cosmos', 'dmg']
 
 
 # -----------------------------------------------------------------------------
@@ -469,7 +443,7 @@ duplicate:
 # the `pdflatex` command and attempt to build the pdf. This requires
 # `summary_plots` to have been run.
 build_report:
-  format: latex
+    format: latex
 
 # -----------------------------------------------------------------------------
 # This section is for calculating metrics
@@ -478,81 +452,83 @@ metrics:
   # Valid IMCs: channels, geometric_mean, gmrotd,
   # greater_of_two_horizontals, rotd
   output_imcs:
-  - ROTD50
-  - channels
+      - ROTD50
+      - geometric_mean
+      - channels
   # Output IMTs
   # Valid IMTs: arias, fas, pga, pgv, sa, duration, sorted_duration
   output_imts:
-  - PGA
-  - PGV
-  - SA
-  - duration
-  - sorted_duration
+      - PGA
+      - PGV
+      - SA
+      - FAS
+      - duration
+      - sorted_duration
   # Periods defined for the SA and FAS imts
   sa:
       # damping used to calculate the spectral response
-    damping: 0.05
+      damping: 0.05
       # periods for which the spectral response is calculated
-    periods:
+      periods:
         # Parameters defining an array of periods
         # syntax is the same as that used for numpy linspace and logspace
         # start (first value), stop (last value), num (number of values)
-      start: 1.0
-      stop: 3.0
-      num: 3
+        start: -2
+        stop: 1
+        num: 91
         # Valid spacing: linspace, logspace
-      spacing: linspace
+        spacing: logspace
         # Defines whether the above array is used. If False, only the
         # defined_periods are used
-      use_array: false
+        use_array: False
         # Defines a list of user defined periods that are not
         # predefined by the array of periods
-      defined_periods:
-      - 0.01
-      - 0.02
-      - 0.03
-      - 0.05
-      - 0.075
-      - 0.1
-      - 0.15
-      - 0.2
-      - 0.25
-      - 0.3
-      - 0.4
-      - 0.5
-      - 0.75
-      - 1.0
-      - 1.5
-      - 2.0
-      - 3.0
-      - 4.0
-      - 5.0
-      - 7.5
-      - 10.0
+        defined_periods:
+        #   - 0.01
+        #   - 0.02
+        #   - 0.03
+        #   - 0.05
+        #   - 0.075
+        #   - 0.1
+        #   - 0.15
+        #   - 0.2
+        #   - 0.25
+        #   - 0.3
+        #   - 0.4
+        #   - 0.5
+        #   - 0.75
+        #   - 1.0
+        #   - 1.5
+        #   - 2.0
+        #   - 3.0
+        #   - 4.0
+        #   - 5.0
+        #   - 7.5
+        #   - 10.0
   fas:
-    smoothing: konno_ohmachi
-    bandwidth: 20.0
-    allow_nans: true
-    periods:
+      smoothing: konno_ohmachi
+      bandwidth: 40.0
+      allow_nans: True
+      periods:
         # Parameters defining an array of periods
         # syntax is the same as that used for numpy linspace and logspace
         # start (first value), stop (last value), num (number of values)
-      start: 1.0
-      stop: 3.0
-      num: 3
+        start: -1
+        stop: 2
+        num: 91
         # Valid spacing: linspace, logspace
-      spacing: linspace
+        spacing: logspace
         # Defines whether the above array is used. If false, only the
         # defined_periods are used
-      use_array: true
+        use_array: True
         # A list of user defined periods that are not
         # predefined by the array of periods.
-      defined_periods:
-      - 0.3
+        defined_periods:
+        # - 0.3
   duration:
-    intervals:
-    - 5-75
-    - 5-95
+      intervals:
+          - 5-75
+          - 5-95
   # Section for Vs30 calculations. This may contain several keys. Each key
   # must be unique, and must have the four attributes: file, column_header,
   # readme_entry, and units.
@@ -575,103 +551,100 @@ pickers:
     # signal window, which in turn can degrade the SNR value.
     # this parameter gives the user the ability to shift the
     # calculated P-wave arrival times forwards or backwards in time.
-  p_arrival_shift: 0.0
+    p_arrival_shift: 0.0
 
     # Options for obspy.signal.trigger.ar_pick()
-  ar:
+    ar:
         # Frequency of the lower bandpass window (Hz)
-    f1: 1.0
+        f1: 1.0
 
         # Frequency of the upper bandpass window (Hz)
-    f2: 20.0
+        f2: 20.0
 
         # Length of LTA for the P arrival (seconds)
-    lta_p: 1.0
+        lta_p: 1.0
 
         # Length of STA for the P arrival (seconds)
-    sta_p: 0.1
+        sta_p: 0.1
 
         # Length of LTA for the S arrival (seconds)
-    lta_s: 4.0
+        lta_s: 4.0
 
         # Length of STA for the S arrival (seconds)
-    sta_s: 1.0
+        sta_s: 1.0
 
         # Number of AR coefficients for the P arrival
-    m_p: 2
+        m_p: 2
 
         # Number of AR coefficients for the S arrival
-    m_s: 8
+        m_s: 8
 
         # Length of variance window for the P arrival (seconds)
-    l_p: 0.1
+        l_p: 0.1
 
         # Length of variance window for the S arrival (seconds)
-    l_s: 0.2
+        l_s: 0.2
 
         # If True, also pick the S phase. Otherwise only the P phase.
-    s_pick: false
+        s_pick: False
 
 
     # Options for obspy.signal.trigger.pk_baer()
-  baer:
+    baer:
         # If dtime exceeds tdownmax, the trigger is examined for validity
-    tdownmax: 20
+        tdownmax: 20
 
         # Minimum number of samples for itrm to be accepted as a pick
-    tupevent: 60
+        tupevent: 60
 
         # Threshold to trigger for pick (c.f. paper)
-    thr1: 7.0
+        thr1: 7.0
 
         # Threshold for updating sigma
-    thr2: 12.0
+        thr2: 12.0
 
         # Number of points taken for the estimation of variance of SF(t) on preset()
-    preset_len: 100
+        preset_len: 100
 
         # Time interval for which the maximum amplitude is evaluated
-    p_dur: 100
+        p_dur: 100
 
-  kalkan:
+    kalkan:
         # undamped natural period in second (default is 0.01 for
         # records sampled with 100 samples-per-second or larger; for
         # records with lower than 100 samples-per-second default
         # is 0.1 s)
-    period: None
+        period: None
 
         # damping ratio
-    damping: 0.6
+        damping: 0.6
 
         # histogram bin size (default is 2/dt for
         # strong-motion acceleration and broadband velocity
         # waveforms; regional or teleseismic records may need
         # different values of bin size for better picking results)
-    nbins: None
+        nbins: None
 
         # Take segment of waveform from beginning to
         # absolute peak value (recommended for fast processing)
         # False to take full waveform.
-    peak_selection: false
+        peak_selection: False
 
     # TODO: Document these options
-  power:
-    highpass: 1.4
-    lowpass: 6
-    order: 3
-    sta: 3.0
-    sta2: 3.0
-    lta: 20.0
-    hanningWindow: 3.0
-    threshDetect: 2.5
-    threshDetect2: 2.5
-    threshRestart: 1.5
+    power:
+        highpass: 1.4
+        lowpass: 6
+        order: 3
+        sta: 3.0
+        sta2: 3.0
+        lta: 20.0
+        hanningWindow: 3.0
+        threshDetect: 2.5
+        threshDetect2: 2.5
+        threshRestart: 1.5
 
-  travel_time:
+    travel_time:
         # this picker uses travel times using configured velocity model
         # list of models can be found here:
         # https://docs.obspy.org/packages/obspy.taup.html#basic-usage
-    model: iasp91
-user:
-  name: Albert Kottke
-  email: albert.kottke@gmail.com
+        model : iasp91
