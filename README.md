@@ -1,6 +1,6 @@
 # docker-gmrecords
 
-Create USGS gmprocess docker container.
+Create USGS gmprocess docker container. Can be installed with `docker pull arkottke/gmrecords:latest`
 
 # Usage
 
