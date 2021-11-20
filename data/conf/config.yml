@@ -480,10 +480,10 @@ metrics:
         spacing: logspace
         # Defines whether the above array is used. If False, only the
         # defined_periods are used
-        use_array: False
+        use_array: True
         # Defines a list of user defined periods that are not
         # predefined by the array of periods
-        defined_periods:
+        # defined_periods:
         #   - 0.01
         #   - 0.02
         #   - 0.03
@@ -523,7 +523,7 @@ metrics:
         use_array: True
         # A list of user defined periods that are not
         # predefined by the array of periods.
-        defined_periods:
+        # defined_periods:
         # - 0.3
   duration:
       intervals:
