@@ -1,0 +1,48 @@
+############# configure aws (must install aws cli locally)
+aws configure
+
+############# test with local docker (must install docker locally to use)
+############# parameters for local testing are in docker-compose.yml
+make build
+make test
+
+############# terraform (must install terraform locally to use)
+cd terraform
+terraform init
+terraform apply
+terraform destroy
+
+############# deploy docker image to AWS ECR
+make push
+
+############# validate your tasks.json file against the schema
+jsonschema scripts/tasks.schema.json -i scripts/tasks.json -o plain
+
+############# zip the inputs
+python scripts/compress_inputs.py -source-folder ./source.tmp -zip-folder ./input.tmp -filter 'Dam*/Period*'
+python scripts/compress_inputs.py -source-folder ./source.tmp -zip-folder ./input.tmp -filter 'faultfiles'
+
+############# upload inputs to S3
+python scripts/upload_inputs.py -bucket test-bruceh -local-folder input.tmp -prefix 'test1/' -filter '*' -threads 10
+
+############# start batch jobs
+python scripts/start_jobs.py -bucket test-bruceh -queue cloudburst1_queue -jobdef cloudburst1_jobdef -workitems Dam001/Period03 -mode full
+python scripts/start_jobs.py -bucket test-bruceh -queue cloudburst1_queue -jobdef cloudburst1_jobdef -workitems 'Dam001/Period02,Dam001/Period02' -mode post
+python scripts/start_jobs.py -bucket test-bruceh -queue cloudburst1_queue -jobdef cloudburst1_jobdef -workitemfile worklist.tmp -mode full
+python scripts/start_jobs.py -bucket test-bruceh -queue cloudburst1_queue -jobdef cloudburst1_jobdef -workitems-s3 -mode full
+
+############ download outputs
+python scripts/get_outputs.py -bucket test-bruceh -prefix 'output/' -local-folder output.tmp -filter '*' -threads 10
+# get all outputs for Dam001
+python scripts/get_outputs.py -bucket test-bruceh -prefix 'output/' -local-folder output.tmp -filter 'Dam001'
+# get all outputs matching Dam001/Periods 1 or 2
+python scripts/get_outputs.py -bucket test-bruceh -prefix 'output/' -local-folder output.tmp -filter 'Dam001/Period0[12]'
+
+############ unzip outputs
+python scripts/unzip_folder.py
+python scripts/unzip_folder.py -zipdir my-output-directory
+python scripts/unzip_folder.py -outdir foo -test
+python scripts/unzip_folder.py -outdir foo -remove-zip
+
+### review the active job definitions
+aws batch describe-job-definitions --status ACTIVE

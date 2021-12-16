@@ -1,0 +1,22 @@
+{
+    "programName" : "gmrecords",
+    "itemName" : "${WORK_ITEM}",
+    "tasks": [
+        {
+            "name" : "gmrecords",
+            "command" : "/working/entrypoint.sh ${WORK_ITEM}",
+            "logBehavior" : "skip",
+            "outputFolder" : "/working/data",
+            "exitOnError" : false
+        }
+    ],
+    "store" : [
+        {
+            "name" : "store h5 output",
+            "bucket" : "${BUCKET_NAME}",
+            "source" : "/working",
+            "dest" : "output_gmrecords/${WORK_ITEM}",
+            "compress" : false
+        }
+    ]
+}

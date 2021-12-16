@@ -1,0 +1,12 @@
+{
+    "programName" : "run PS",
+    "$schema": "./tasks.schema.json",
+    "itemName" : "none",
+    "tasks": [
+        {
+            "name" : "test",
+            "command" : "ps -aux && exit 55",
+            "logBehavior" : "skip"
+        }
+    ]
+}
