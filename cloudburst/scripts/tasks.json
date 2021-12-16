@@ -1,12 +1,32 @@
 {
-    "programName" : "run PS",
-    "$schema": "./tasks.schema.json",
-    "itemName" : "none",
+    "programName" : "gmrecords",
+    "itemName" : "${WORK_ITEM}",
+    "fetch" : [
+        {
+            "name" : "get-outputs",
+            "includeWhenMode" : "pre-fetch",
+            "bucket" : "${BUCKET_NAME}",
+            "key" : "output_gmrecords/${WORK_ITEM}/data/${WORK_ITEM}/workspace.h5",
+            "dest" : "/working/${WORK_ITEM}",
+            "expand" : false
+        }
+    ],
     "tasks": [
         {
-            "name" : "test",
-            "command" : "df -h",
-            "logBehavior" : "skip"
+            "name" : "gmrecords",
+            "command" : "/working/entrypoint.sh ${WORK_ITEM}",
+            "logBehavior" : "skip",
+            "outputFolder" : "/working/data",
+            "exitOnError" : false
+        }
+    ],
+    "store" : [
+        {
+            "name" : "store h5 output",
+            "bucket" : "${BUCKET_NAME}",
+            "source" : "/working/data/${WORK_ITEM}",
+            "dest" : "output_gmrecords/${WORK_ITEM}",
+            "compress" : false
         }
     ]
 }
