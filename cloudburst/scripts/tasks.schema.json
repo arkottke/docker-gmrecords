@@ -1,0 +1,243 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Task Processing Document",
+    "description": "Processing instruction document for the PGE cloud processing framework",
+    "type": "object",
+	"properties": {
+	  "programName": {
+		"description": "A name that describes the server process (e.g. hazard-analysis)",
+		"type": "string"
+	  },
+	  "itemName": {
+		"description": "A name describing the item (unit of work) being processed",
+		"type": "string"
+	  },
+	  "supportedModes": {
+		"description": "a list of modes supported by the server process (optional)",
+		"type": "array",
+		"items": { 
+			"type": "string" 
+		},
+		"minItems": 1,
+	    "uniqueItems": true
+	  },
+	  "fetch": {
+		"type": "array",
+		"items": [
+		  {
+			"type": "object",
+			"properties": {
+			  "name": {
+				"description": "A name to describe what this fetch does",
+				"type": "string"
+			  },
+			  "includeWhenMode": {
+				"description": "When provided, this fetch will be processed only if it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "excludeWhenMode": {
+				"description": "When provided, this fetch will not be processed when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "bucket": {
+				"description": "the name of the S3 bucket to fetch from",
+				"type": "string"
+			  },
+			  "key": {
+				"description": "the key of the file to retrieve",
+				"type": "string"
+			  },
+			  "dest": {
+				"description": "the local file path that the file is copied to.",
+				"type": "string"
+			  },
+			  "expand": {
+				"description": "unzip the file. It will be expanded in place",
+				"type": "boolean"
+			  },
+			  "excludeFilePattern": {
+				"description": "removes files from the fetch when they match one of the patterns in the list",
+				"type": "array",
+				"items": { "type": "string" 
+				},
+				"minItems": 1,
+				"uniqueItems": true
+			  },
+			  "exitOnError": {
+				"description": "stops processing if an error is encountered. The default is true",
+				"type": "boolean"
+			  }
+			},
+			"required": [
+			  "name",
+			  "bucket",
+			  "key",
+			  "dest",
+			  "expand"
+			]
+		  }
+		]
+	  },
+	  "tasks": {
+		"type": "array",
+		"minItems": 1,
+		"items": [
+		  {
+			"type": "object",
+			"properties": {
+			  "name": {
+				"description": "a name that describes the process being run",
+				"type": "string"
+			  },
+			  "includeWhenMode": {
+				"description": "this item will be processed only when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "excludeWhenMode": {
+				"description": "this item will not be processed when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "command": {
+				"description": "the shell command to be executed. May use [INPUT_FILE_PATH] macro to specify any files found by searching inputFolder for inputFilePattern",
+				"type": "string"
+			  },
+			  "inputFolder": {
+				"description": "the folder to search for input files (optional)",
+				"type": "string"
+			  },
+			  "inputFilePattern": {
+				"description": "a pattern used to match for input files (optional)",
+				"type": "string"
+			  },
+			  "outputFolder": {
+				"description": "the output folder, will be created before command is run (optional)",
+				"type": "string"
+			  },
+			  "logBehavior": {
+				"description": "when any string is specified, do not capture and analyze log output (optional)",
+				"type": "string"
+			  },
+			  "exitOnError": {
+				"description": "stops processing if an error is encountered. The default is true",
+				"type": "boolean"
+			  }
+			},
+			"required": [
+			  "name",
+			  "command"
+			]
+		  }
+		]
+	  },
+	  "move": {
+		"type": "array",
+		"items": [
+		  {
+			"type": "object",
+			"properties": {
+			  "name": {
+				"type": "string"
+			  },
+			  "includeWhenMode": {
+				"description": "this item will be processed only when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "excludeWhenMode": {
+				"description": "this item will not be processed when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "inputFolder": {
+				"description": "the folder to copy the files from",
+				"type": "string"
+			  },
+			  "includeFilePattern": {
+				"description": "includes files if they match one of the patterns in the array (required)",
+				"type": "array",
+				"items": { "type": "string" },
+				"minItems": 1,
+				"uniqueItems": true
+			  },
+			  "excludeFilePattern": {
+				"description": "excludes files if they match one of the patterns in the array (optional)",
+				"type": "array",
+				"items": { "type": "string" },
+				"minItems": 1,
+				"uniqueItems": true
+			  },
+			  "outputFolder": {
+				"description": "the folder to copy the files to",
+				"type": "string"
+			  },
+			  "exitOnError": {
+				"description": "stops processing if an error is encountered. The default is true",
+				"type": "boolean"
+			  }
+			},
+			"required": [
+			  "name",
+			  "inputFolder",
+			  "includeFilePattern",
+			  "outputFolder"
+			]
+		  }
+		]
+	  },
+	  "store": {
+		"type": "array",
+		"items": [
+		  {
+			"type": "object",
+			"properties": {
+			  "name": {
+				"type": "string"
+			  },
+			  "includeWhenMode": {
+				"description": "this item will be processed only when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "excludeWhenMode": {
+				"description": "this item will not be processed when it matches the mode (optional)",
+				"type": "string"
+			  },
+			  "bucket": {
+				"description": "the name of the bucket to copy the files to",
+				"type": "string"
+			  },
+			  "source": {
+				"description": "the file or directory to copy from",
+				"type": "string"
+			  },
+			  "dest": {
+				"description": "the S3 path of the file to store to. When 'compress' is True, this should be a zip file name",
+				"type": "string"
+			  },
+			  "compress": {
+				"description": "zip the source, or not",
+				"type": "boolean"
+			  },
+			  "removeOnStore": {
+				"description": "remove the zip file when it has been copied",
+				"type": "boolean"
+			  },
+			  "exitOnError": {
+				"description": "stops processing if an error is encountered. The default is true",
+				"type": "boolean"
+			  }
+			},
+			"required": [
+			  "name",
+			  "bucket",
+			  "source",
+			  "dest",
+			  "compress"
+			]
+		  }
+		]
+	  }
+	},
+	"required": [
+	  "programName",
+	  "itemName",
+	  "tasks"
+	]
+  }

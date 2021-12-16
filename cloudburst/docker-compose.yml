@@ -1,0 +1,21 @@
+version: "3"
+services:
+    cloudburst1:
+        build:
+            context: .
+            network: host
+
+        image: cloudburst1
+        stdin_open: true # docker run -i
+        tty: true        # docker run -t
+        environment:
+            - AWS_REGION=us-west-1
+            - BUCKET_NAME=
+            - MODE_STR=
+            - LOCAL_MODE=0
+            - WORK_ITEM=test1
+            # - TASKS_PATH=/opt/pge-fw/tasks-example1.json
+        volumes:
+            - ~/.aws/credentials:/home/ubuntu/.aws/credentials:ro
+        # entrypoint: /bin/bash
+        # run with: docker compose run test

@@ -28,6 +28,7 @@ FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && \
   apt-get upgrade -y && \
+  apt-get install -y p7zip && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
@@ -38,11 +39,14 @@ COPY --from=build /venv /venv
 RUN echo "source /venv/bin/activate" >> /root/.bashrc
 SHELL ["/bin/bash", "-l", "-c"]
 
+RUN pip install boto3 jsonschema
 RUN mkdir /working
 WORKDIR /working
 
-ENV FONTCONFIG_PATH=/etc/fonts
-RUN echo "Test gmrecords"
-RUN source /venv/bin/activate && gmrecords -v
+# Copy the cloudburst framework and the data directory
+COPY cloudburst/scripts /opt/cloudburst
+COPY data /working
 
-# ENTRYPOINT source /venv/bin/activate && gmrecords
+ENV FONTCONFIG_PATH=/etc/fonts
+
+ENTRYPOINT source /venv/bin/activate && python3 /opt/cloudburst/fw_entrypoint.py
