@@ -24,8 +24,13 @@
         {
             "name" : "store h5 output",
             "bucket" : "${BUCKET_NAME}",
+<<<<<<< HEAD
             "source" : "/working/data/${WORK_ITEM}/workspace.h5",
             "dest" : "output_gmrecords/${WORK_ITEM}/workspace.h5",
+=======
+            "source" : "/working/data/${WORK_ITEM}",
+            "dest" : "output_gmrecords/${WORK_ITEM}",
+>>>>>>> 45caf47881680678021cf5b450e2810d317912af
             "compress" : false
         }
     ]
