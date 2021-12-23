@@ -50,16 +50,26 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
         expand: bool = fetch['expand']
 
         # fetch file from S3
-        return_code = s3lib.copy_s3_object(bucket, key, dest)
+        return_code = s3lib.get_files(bucket, key, dest, filter=None)
+        # return_code = s3lib.copy_s3_object(bucket, key, dest)
         if exit_on_error and return_code != 0:
             break
             # unzip the inputs, prepare input files
         elif expand:
-            ret = ziplib.expand(dest, Path(dest).parent)
+            if dest.endswith('/'):
+                expand_to = dest
+            else:
+                expand_to = Path(dest).parent
+            
+            return_code = ziplib.expand(dest, expand_to)
             if exit_on_error and return_code != 0:
                 break
             elif remove_zips:
-                os.remove(dest)
+                if len(dest) > 3 and dest[-3:] == '.7z':
+                    os.remove(dest)
+                elif dest.endswith('/'):
+                    for file in Path(dest).glob('*.7z'):
+                        file.unlink()
 
         if 'excludeFilePattern' in fetch:
             patterns = fetch['excludeFilePattern']
@@ -68,12 +78,13 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
                 print(f'removing file: {file}')
                 os.remove(file)
 
-        return return_code
+    return return_code
 
 
 def run_tasks(process_list: list, mode: str):
     logFolder = "./logs"
-
+    return_code = 0
+    
     # create logs folder if it doesn't exist
     os.makedirs(logFolder, exist_ok=True)
 
@@ -182,32 +193,47 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
             futures.append(executor.submit(process_runner, process_name, counter, len(work_list), cmd))
 
         for future in concurrent.futures.as_completed(futures):
-            process_result = future.result()
-            # print(processResult)
-            if exit_on_error and process_result.returncode != 0:
-                return_code = process_result.returncode
-                break
-
+            try:
+                process_result = future.result()
+                if exit_on_error and process_result.returncode != 0:
+                    return_code = process_result.returncode
+            except Exception as err:
+                print(f'error in process: {str(err)}')
+                if exit_on_error:
+                    return_code = 244
+            
     if return_code != 0:
         # post-process the error log files. Remove them if empty, report them if not
         print(f"error running {process_name}...")
         files = Path(log_folder).glob(f"{process_name}-*.err")
-
+        logs = ''
         for file in files:
             if Path(file).stat().st_size == 0:
                 os.remove(file)
             else:
                 with open(file) as myfile:
                     a_errs = myfile.readlines()
-                sErrs = '\n'.join(map(str, a_errs))
+                errs = '\n'.join(map(str, a_errs))
+
+                log_file = str(file).replace('.err','.log')
+                if Path(log_file).stat().st_size > 0:
+                    with open(log_file) as myfile2:
+                        a_logs = myfile2.readlines()
+                    if len(a_logs) > 10:
+                        # only display the last 10 lines
+                        a_logs = a_logs[len(a_logs)-10:len(a_logs)-1]
+                    logs = '\n'.join(map(str, a_logs))
+
                 subject = f"errors found processing {process_name}, file: {file}"
-                message = "contents: " + sErrs
+                message = f"contents: {logs}\nErrors:\n{errs}"
 
                 print(subject + ". " + message)
     return return_code
 
 
 def move_files(move_tasks: list, mode: str):
+    return_code = 0
+    
     for task in move_tasks:
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in task:
@@ -254,6 +280,7 @@ def move_files(move_tasks: list, mode: str):
                                 return 213
                             else:
                                 print(f"warning: {err_str}")
+    return return_code
 
 
 def prepare_outputs(tasks_store: list, mode: str):
