@@ -118,7 +118,7 @@ def get_file(bucket:str, local_file:str, client: boto3.client, key:str):
 
         client.download_file(Bucket=bucket, Key=str(key), Filename=str(local_file))
     except BaseException as ex:
-        print("failed to download {0}: {1}".format(local_file, str(ex)))
+        print(f"failed to download {local_file} from {key}: {str(ex)}")
         return_code = 217
     
     return return_code
@@ -161,7 +161,7 @@ def get_files(bucket_name:str, prefix:str, local_path:str, filter:str = None, th
                 if len(prefix) == 0:
                     rel_key = key
                 else:
-                    if local_path.endswith('/'):
+                    if (Path(local_path).exists() and Path(local_path).is_dir()) or str(local_path).endswith('/'):
                         tmp_prefix = prefix
                         if prefix[-1] != '/':
                             tmp_prefix = os.path.dirname(prefix)
