@@ -153,31 +153,58 @@ def get_files(bucket_name:str, prefix:str, local_path:str, filter:str = None, th
     client = session.client("s3")
     print(f'fetching: {local_path} from s3://{bucket_name}/{prefix}')
 
-    futures = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-        for key in list_objects(bucket_name=bucket_name, client=client, prefix=prefix):
-            if filter is None or filter == '' or re.search(filter, key):
-                # get last index of '/'
-                if len(prefix) == 0:
-                    rel_key = key
-                else:
-                    if (Path(local_path).exists() and Path(local_path).is_dir()) or str(local_path).endswith('/'):
+    the_local_path = Path(local_path)
+
+    keys = []
+    for key in list_objects(bucket_name=bucket_name, client=client, prefix=prefix):
+        if filter is None or filter == '' or re.search(filter, key):
+            keys.append(key)
+
+    # print (f"len of keys: {len(keys)}")
+
+    if len(keys) == 1:
+        file_name = Path(keys[0]).name
+        # if an existing directory is given
+        if the_local_path.exists() and the_local_path.is_dir():
+            local_file = the_local_path.joinpath(file_name)
+        else:
+            # if the local path ends with the filename from the key, or if the requested key was exact, don't append
+            if str(local_path).endswith(file_name) or keys[0] == prefix:
+                local_file = local_path
+            else:
+                local_file = the_local_path.joinpath(file_name)
+
+        return_code = get_file(bucket_name, local_file, client, keys[0])
+    elif len(keys) > 1:
+        # assume we are downloading to a directory when there are multiple files
+        os.makedirs(the_local_path, exist_ok=True)
+
+        # multithreaded fetch
+        futures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+            for key in keys:
+                if filter is None or filter == '' or re.search(filter, key):
+                    # get last index of '/'
+                    if len(prefix) == 0:
+                        local_file = the_local_path.joinpath(key)
+                    else:
                         tmp_prefix = prefix
                         if prefix[-1] != '/':
                             tmp_prefix = os.path.dirname(prefix)
                         rel_key = key.replace(tmp_prefix,'')
                         if rel_key[0] == '/':
                             rel_key = rel_key[1:]
-                        local_file = os.path.join(local_path, rel_key)
-                    else:
-                        local_file = local_path
+                        local_file = the_local_path.joinpath(rel_key)
 
-                # print(f'prefix: {prefix}  tmp_prefix: {tmp_prefix} rel_key: {rel_key} local_file {local_file}')
-                futures.append(executor.submit(get_file, bucket_name, local_file, client, key))
-        
-        for future in concurrent.futures.as_completed(futures):
-                process_result = future.result()
-                if process_result != 0:
-                    return_code = process_result
+                    # print(f'prefix: {prefix}  tmp_prefix: {tmp_prefix} rel_key: {rel_key} local_file {local_file}')
+                    futures.append(executor.submit(get_file, bucket_name, local_file, client, key))
+
+            for future in concurrent.futures.as_completed(futures):
+                    process_result = future.result()
+                    if process_result != 0:
+                        return_code = process_result
+    else:
+        print(f"error: no object found at s3://{bucket}/{key}")
+        return_code = 218
 
     return return_code
