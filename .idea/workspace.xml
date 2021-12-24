@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="" />
+    <list default="true" id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="bring in pycharm files" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,6 +32,14 @@
       <option name="presentableId" value="Default" />
       <updated>1640238094621</updated>
     </task>
+    <task id="LOCAL-00001" summary="bring in pycharm files">
+      <created>1640238924712</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1640238924712</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -44,5 +52,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="bring in pycharm files" />
+    <option name="LAST_COMMIT_MESSAGE" value="bring in pycharm files" />
   </component>
 </project>
