@@ -341,31 +341,36 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
         if 'removeOnStore' in task:
             remove_on_store = task['removeOnStore']
 
-        if Path(source).exists():
-            if len(list(Path(source).glob('*'))) == 0:
+        if not Path(source).exists():
+            print(f'error: source path for store task [{name}] does not exists: {source}')
+            if exit_on_error:
+                return_code = 43
+                break
+        else:
+            if Path(source).is_dir() and list(Path(source).glob('*')) == 0:
                 print(f"skipping empty output directory for storage task [{name}]: {source}")
             else:
                 print(f"saving outputs: {source}")
 
                 if compress:
-                    src_dir = str(Path(source))
+                    src = str(Path(source))
                     # trim trailing / character
-                    if src_dir[-1] == '/':
-                        src_dir = src_dir[0:-1]
-                    tmpZip = src_dir + ".7z"
+                    if src[-1] == '/':
+                        src = src[0:-1]
+                    tmp_zip = src + ".7z"
 
-                    rc = ziplib.compress(destination_path=src_dir, source_path=tmpZip)
+                    rc = ziplib.compress(source_path=src, zip_path=tmp_zip)
                     if exit_on_error and rc != 0:
                         return_code = rc
                         break
 
-                    rc = s3lib.write_s3_object(bucket, dest, tmpZip)
+                    rc = s3lib.write_s3_object(bucket, dest, tmp_zip)
                     if exit_on_error and rc != 0:
                         return_code = rc
                         break
 
                     if remove_on_store:
-                        os.remove(tmpZip)
+                        os.remove(tmp_zip)
                 else:
                     rc = s3lib.put_files(bucket_name=bucket, local_folder=source, prefix=dest)
                     if exit_on_error and rc != 0:

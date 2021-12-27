@@ -20,7 +20,7 @@ def compress_inputs(source_folder:Path = 'source.tmp/', zip_folder : Path = 'zip
             if os.path.exists(out_file):
                 os.remove(out_file)
             
-            ziplib.compress(destination_path=dir, source_path=out_file)
+            ziplib.compress(source_path=dir, zip_path=out_file)
             
 # load the data into S3 
 def upload(

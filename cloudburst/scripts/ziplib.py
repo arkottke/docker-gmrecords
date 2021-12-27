@@ -5,12 +5,11 @@ import os
 from pathlib import Path
 
 # Compresses a 7zip archive, providing exception handling and logging
-def compress(source_path:Path, destination_path:Path):
+def compress(zip_path:Path, source_path:Path):
+    zip_path = Path(zip_path)
     source_path = Path(source_path)
-    destination_path = Path(destination_path)
 
-    print(f'compressing: {destination_path} to: {source_path}')
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    print(f'compressing: {source_path} to: {zip_path}')
 
     try:
         if os.name == 'nt':
@@ -21,9 +20,9 @@ def compress(source_path:Path, destination_path:Path):
             redirect = ' > /dev/null'
 
         # resolve() is needed to normalize the path, else the containing directory shows up in the archive!
-        return os.system(f'{exec_7z} a -mx1 -y "{source_path}" "{destination_path.resolve()}"{redirect}')
+        return os.system(f'{exec_7z} a -mx1 -y "{zip_path}" "{source_path.resolve()}"{redirect}')
     except Exception as err:
-        print(f'error zipping {destination_path} to {source_path}: {str(err)}')
+        print(f'error zipping {source_path} to {zip_path}: {str(err)}')
         return 211
 
 
