@@ -372,7 +372,16 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
                     if remove_on_store:
                         os.remove(tmp_zip)
                 else:
-                    rc = s3lib.put_files(bucket_name=bucket, local_folder=source, prefix=dest)
+                    if Path(source).is_dir():
+                        rc = s3lib.put_files(bucket_name=bucket, local_folder=source, prefix=dest)
+                    else:
+                        # handle case where a directory name is specified for the destination
+                        if dest[-1] == '/':
+                            key = Path(dest).joinpath(Path(source).name)
+                        else:
+                            key = dest
+
+                        rc = s3lib.write_s3_object(bucket, key, source)
                     if exit_on_error and rc != 0:
                         return_code = rc
                         break

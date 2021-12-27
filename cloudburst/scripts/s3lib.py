@@ -49,14 +49,10 @@ def copy_s3_objects(bucket_name, prefix, local_folder):
 def write_s3_object(bucket_name, key, file):
 
     print (f"storing {file} to s3://{bucket_name}/{key}")
-    s3 = boto3.resource('s3')
+    session = boto3.Session()
+    client = session.client('s3')
 
-    try:
-        s3.Bucket(bucket_name).upload_file(Key=key,Filename=file)
-        return 0
-    except Exception as err:
-        print ("error storing {0} to {1}/{2}: {3}".format(file, bucket_name, key, str(err)))
-        return 215
+    return put_file(bucket_name, client=client, local_file=Path(file), key=key)
 
 # delegate to download a single file, used by multi-threader in getFiles()
 def put_file(bucket: str, client: boto3.client, local_file: Path, key: str):
@@ -70,7 +66,7 @@ def put_file(bucket: str, client: boto3.client, local_file: Path, key: str):
         s3_file (str): S3 object name
     """
     try:
-        # print(f'uploading: {local_file} to {bucket}/{key}')
+        # print(f'storing: {local_file} to s3://{bucket}/{key}')
         client.upload_file(Bucket=bucket, Key=key, Filename=str(local_file))
     except BaseException as ex:
         return_code = 215
