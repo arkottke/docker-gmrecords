@@ -66,6 +66,10 @@
 			  "exitOnError": {
 				"description": "stops processing if an error is encountered. The default is true",
 				"type": "boolean"
+			  },
+			  "required": {
+				"description": "when set to true, will attempt even with prior errors. The default is false",
+				"type": "boolean"
 			  }
 			},
 			"required": [
@@ -120,6 +124,10 @@
 			  "exitOnError": {
 				"description": "stops processing if an error is encountered. The default is true",
 				"type": "boolean"
+			  },
+			  "required": {
+				"description": "when set to true, will attempt even with prior errors. The default is false",
+				"type": "boolean"
 			  }
 			},
 			"required": [
@@ -171,6 +179,10 @@
 			  "exitOnError": {
 				"description": "stops processing if an error is encountered. The default is true",
 				"type": "boolean"
+			  },
+			  "required": {
+				"description": "when set to true, will attempt even with prior errors. The default is false",
+				"type": "boolean"
 			  }
 			},
 			"required": [
@@ -221,6 +233,10 @@
 			  },
 			  "exitOnError": {
 				"description": "stops processing if an error is encountered. The default is true",
+				"type": "boolean"
+			  },
+			  "required": {
+				"description": "when set to true, will attempt even with prior errors. The default is false",
 				"type": "boolean"
 			  }
 			},

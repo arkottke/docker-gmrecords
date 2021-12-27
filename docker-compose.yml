@@ -16,6 +16,6 @@ services:
             - WORK_ITEM=test1
             # - TASKS_PATH=/opt/pge-fw/tasks-example1.json
         volumes:
-            - ~/.aws/credentials:/home/ubuntu/.aws/credentials:ro
+            - ~/.aws/credentials:/root/.aws/credentials:ro
         # entrypoint: /bin/bash
         # run with: docker compose run test

@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+# cloudburst framework - Bruce Hearn 2021 bruce.hearn@gmail.com
+# tests clilib. These are manual tests, i.e. no conditions are checked, but results must
+# be observed. In future we will use a known test data set and add verification code
+
 import os
 import clilib
 
