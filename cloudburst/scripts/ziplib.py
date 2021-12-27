@@ -10,6 +10,8 @@ def compress(zip_path:Path, source_path:Path):
     source_path = Path(source_path)
 
     print(f'compressing: {source_path} to: {zip_path}')
+    if not zip_path.parent is None and not zip_path.parent.exists():
+        os.makedirs(zip_path.parent, exist_ok=True)
 
     try:
         if os.name == 'nt':
