@@ -1,30 +1,19 @@
 {
     "programName" : "gmrecords",
     "itemName" : "${WORK_ITEM}",
-    "fetch" : [
-        {
-            "name" : "get-outputs",
-            "includeWhenMode" : "pre-fetch",
-            "bucket" : "${BUCKET_NAME}",
-            "key" : "output_gmrecords/${WORK_ITEM}/workspace.h5",
-            "dest" : "/working/data/${WORK_ITEM}/workspace.h5",
-            "expand" : false
-        }
-    ],
     "tasks": [
         {
             "name" : "gmrecords",
             "command" : "/working/entrypoint.sh ${WORK_ITEM}",
             "logBehavior" : "skip",
-            "outputFolder" : "/working/data",
-            "exitOnError" : false
+            "outputFolder" : "/working/data"
         }
     ],
     "store" : [
         {
             "name" : "store h5 output",
             "bucket" : "${BUCKET_NAME}",
-            "source" : "/working/data/${WORK_ITEM}/workspace.h5",
+            "source" : "data/${WORK_ITEM}/workspace.h5",
             "dest" : "output_gmrecords/${WORK_ITEM}/workspace.h5",
             "compress" : false
         }
