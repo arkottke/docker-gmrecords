@@ -28,7 +28,7 @@ FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && \
   apt-get upgrade -y && \
-  apt-get install -y p7zip && \
+  apt-get install -y p7zip-full && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
