@@ -46,7 +46,7 @@ def copy_s3_objects(bucket_name, prefix, local_folder):
         return 214
 
 # write an object to S3, with error handling
-def write_s3_object(bucket_name, key, file):
+def write_s3_object(bucket_name:str, key:str, file:Path):
 
     print (f"storing {file} to s3://{bucket_name}/{key}")
     session = boto3.Session()

@@ -364,7 +364,12 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
                         return_code = rc
                         break
 
-                    rc = s3lib.write_s3_object(bucket, dest, tmp_zip)
+                    if dest[-1] == '/':
+                        key = Path(dest).joinpath(Path(tmp_zip).name)
+                    else:
+                        key = dest
+
+                    rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=tmp_zip)
                     if exit_on_error and rc != 0:
                         return_code = rc
                         break
@@ -381,7 +386,7 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
                         else:
                             key = dest
 
-                        rc = s3lib.write_s3_object(bucket, key, source)
+                        rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=source)
                     if exit_on_error and rc != 0:
                         return_code = rc
                         break
