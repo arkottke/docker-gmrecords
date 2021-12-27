@@ -6,7 +6,7 @@
             "name" : "gmrecords",
             "command" : "/working/entrypoint.sh ${WORK_ITEM}",
             "logBehavior" : "skip",
-            "outputFolder" : "/working/data"
+            "outputFolder" : "/working/data/${WORK_ITEM}/"
         }
     ],
     "store" : [
