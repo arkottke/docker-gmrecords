@@ -60,6 +60,7 @@ def write_s3_object(bucket_name, key, file):
 
 # delegate to download a single file, used by multi-threader in getFiles()
 def put_file(bucket: str, client: boto3.client, local_file: Path, key: str):
+    return_code = 0
     """
     Download a single file from S3
     Args:
@@ -69,10 +70,13 @@ def put_file(bucket: str, client: boto3.client, local_file: Path, key: str):
         s3_file (str): S3 object name
     """
     try:
-        print(f'uploading: {local_file} to {bucket}/{key}')
+        # print(f'uploading: {local_file} to {bucket}/{key}')
         client.upload_file(Bucket=bucket, Key=key, Filename=str(local_file))
     except BaseException as ex:
+        return_code = 215
         print(f'failed to upload {local_file}: {str(ex)}')
+
+    return return_code
 
 # multi-threaded impl: files in folder to s3 bucket/prefix/
 def put_files(bucket_name:str, local_folder:Path, prefix:str, filter:str = '*', threads:int = 10):
@@ -82,12 +86,22 @@ def put_files(bucket_name:str, local_folder:Path, prefix:str, filter:str = '*', 
     session = boto3.Session()
     client = session.client('s3')
 
+    # Path ignores preceding './'. Remove it so we can substitute accurately
+    local_folder = str(local_folder)
+    if len(local_folder) > 2 and str(local_folder).startswith('./'):
+        local_folder = str(local_folder)[2:]
+
     futures = []
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
             for file in Path(local_folder).rglob(filter):
                 if file.is_file() and not 'DS_Store' in file.name:
-                    key = str(file).replace(str(local_folder), prefix).replace('//', '/')
+                    if str(file).startswith(str(local_folder)):
+                        tmp = str(file)[len(str(local_folder)):]
+                        if len(str(prefix)) > 0 and prefix[len(str(prefix))-1] != '/':
+                            prefix = prefix + '/'
+                        key = prefix + tmp
+                    key = key.replace('//', '/')
                     futures.append(executor.submit(put_file, bucket_name, client, file, key))
 
             for future in concurrent.futures.as_completed(futures):
@@ -113,7 +127,7 @@ def get_file(bucket:str, local_file:str, client: boto3.client, key:str):
         s3_file (str): S3 object name
     """ 
     try:
-        print(f'downloading: {local_file} from s3://{bucket}/{key}')
+        # print(f'downloading: {local_file} from s3://{bucket}/{key}')
         os.makedirs(os.path.dirname(local_file), exist_ok=True)
 
         client.download_file(Bucket=bucket, Key=str(key), Filename=str(local_file))

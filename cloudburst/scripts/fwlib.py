@@ -20,13 +20,20 @@ EXIT_ON_ERROR = True
 
 
 # get the input data for all the sites we are going to process
-def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
+def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors:bool = False):
     return_code = 0
 
     # TODO: move elsewhere or change default
     remove_zips = True
 
     for fetch in fetches:
+        required = False
+        if 'required' in fetch:
+            required = fetch['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in fetch:
             exit_on_error = fetch['exitOnError']
@@ -50,9 +57,10 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
         expand: bool = fetch['expand']
 
         # fetch file from S3
-        return_code = s3lib.get_files(bucket, key, dest, filter=None)
+        rc = s3lib.get_files(bucket, key, dest, filter=None)
         # return_code = s3lib.copy_s3_object(bucket, key, dest)
-        if exit_on_error and return_code != 0:
+        if exit_on_error and rc != 0:
+            return_code = rc
             break
             # unzip the inputs, prepare input files
         elif expand:
@@ -81,7 +89,7 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
     return return_code
 
 
-def run_tasks(process_list: list, mode: str):
+def run_tasks(process_list: list, mode: str, prior_errors:bool = False):
     logFolder = "./logs"
     return_code = 0
     
@@ -89,6 +97,13 @@ def run_tasks(process_list: list, mode: str):
     os.makedirs(logFolder, exist_ok=True)
 
     for process in process_list:
+        required = False
+        if 'required' in process:
+            required = process['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in process:
             exit_on_error = process['exitOnError']
@@ -131,8 +146,8 @@ def run_tasks(process_list: list, mode: str):
 
             if len(work_list) == 0:
                 print(f"Error preparing {proc_name} work list. No files found in {file_pattern}")
-                return_code = 232
                 if exit_on_error:
+                    return_code = 232
                     break
 
         log_behavior = None
@@ -140,9 +155,10 @@ def run_tasks(process_list: list, mode: str):
             log_behavior = process['logBehavior']
 
         # run the current process
-        return_code = manage_process(proc_name, work_list, process["command"], log_behavior, exit_on_error)
-        if exit_on_error and return_code != 0:
-            print("Errors found processing " + proc_name + ", ending early")
+        rc = manage_process(proc_name, work_list, process["command"], log_behavior, exit_on_error)
+        if exit_on_error and rc != 0:
+            print("errors found processing " + proc_name + ", ending early")
+            return_code = rc
             break
 
     return return_code
@@ -153,7 +169,6 @@ def process_runner(process_name: str, item: int, items: int, cmd: str):
     escapedCmd = cmd.replace("\n", "\\n")
     print(f'starting: [{process_name}] #{item}/{items} [{escapedCmd}]')
     return subprocess.run(cmd, shell=True)
-    # print(f'stopping: #{item}')
 
 
 # ************************************************************************************************************
@@ -231,10 +246,17 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
     return return_code
 
 
-def move_files(move_tasks: list, mode: str):
+def move_files(move_tasks: list, mode: str, prior_errors:bool = False):
     return_code = 0
     
     for task in move_tasks:
+        required = False
+        if 'required' in task:
+            required = task['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in task:
             exit_on_error = task['exitOnError']
@@ -263,7 +285,6 @@ def move_files(move_tasks: list, mode: str):
             for includePattern in include_file_pattern:
                 for file in Path(input_folder).rglob(includePattern):
                     if exclude_file_pattern is None or not (True in [file.match(p) for p in exclude_file_pattern]):
-
                         try:
                             os.makedirs(output_folder, exist_ok=True)
                             print(f'moving {file} to {output_folder}')
@@ -283,10 +304,17 @@ def move_files(move_tasks: list, mode: str):
     return return_code
 
 
-def prepare_outputs(tasks_store: list, mode: str):
+def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
     return_code = 0
 
     for task in tasks_store:
+        required = False
+        if 'required' in task:
+            required = task['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in task:
             exit_on_error = task['exitOnError']
@@ -326,19 +354,22 @@ def prepare_outputs(tasks_store: list, mode: str):
                         src_dir = src_dir[0:-1]
                     tmpZip = src_dir + ".7z"
 
-                    return_code = ziplib.compress(destination_path=src_dir, source_path=tmpZip)
-                    if exit_on_error and return_code != 0:
+                    rc = ziplib.compress(destination_path=src_dir, source_path=tmpZip)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
-                    return_code = s3lib.write_s3_object(bucket, dest, tmpZip)
-                    if exit_on_error and return_code != 0:
+                    rc = s3lib.write_s3_object(bucket, dest, tmpZip)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
                     if remove_on_store:
                         os.remove(tmpZip)
                 else:
-                    return_code = s3lib.put_files(bucket, source, dest)
-                    if exit_on_error and return_code != 0:
+                    rc = s3lib.put_files(bucket_name=bucket, local_folder=source, prefix=dest)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
     return return_code

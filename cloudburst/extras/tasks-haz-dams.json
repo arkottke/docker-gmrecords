@@ -136,7 +136,8 @@
             "dest" : "logs/${WORK_ITEM}.7z",
             "compress" : true,
             "removeOnStore" : false,
-            "exitOnError": false
+            "exitOnError": false,
+            "required": true
         }
     ]
 }
