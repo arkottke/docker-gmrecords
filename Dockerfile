@@ -12,8 +12,8 @@ RUN apt-get update -q && \
 RUN cd /root && \
   git clone --depth 1 https://github.com/arkottke/groundmotion-processing gmprocess && \
   cd gmprocess && \
-# Need to install an non-editable version. Install script typically just links
-  sed -i 's/pip install -e ./pip install ./' install.sh && \
+# conda pack doesn't allow editable packages so we need to modify the install script
+  sed -i 's/pip install \(.*\) -e ./pip install \1 ./' install.sh && \
   bash install.sh
 
 # Use conda-pack to create a standalone enviornment
