@@ -1,5 +1,6 @@
 {
     "programName" : "gmrecords",
+    "$schema": "tasks.schema.json",
     "itemName" : "${WORK_ITEM}",
     "tasks": [
         {

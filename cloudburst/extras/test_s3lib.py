@@ -3,7 +3,9 @@
 # tests s3lib. These are manual tests, i.e. no conditions are checked, but results must
 # be observed. In future we will use a known test data set and add verification code
 import sys
-sys.path.append("scripts")
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.joinpath("scripts")))
+
 import s3lib
 
 def test_get_files(bucket:str):

@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="bring in pycharm files">
+    <list default="true" id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="add correct output folder">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-example1.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-example1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-fetch-store.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-fetch-store.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-haz-dams.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-haz-dams.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_clilib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_clilib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_fwlib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_fwlib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_s3lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_s3lib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_ziplib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_ziplib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/fwlib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/fwlib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/tasks.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/tasks.schema.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/tasks.schema.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
