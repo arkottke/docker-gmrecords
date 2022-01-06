@@ -74,6 +74,7 @@ is recommended. In Linux, you can use your favorite package manager.
 
         git clone https://github.com/bh3791/cloudburst.git my-project
 
+
    - Next, add a remote (shortcut):
 
 
@@ -86,22 +87,38 @@ is recommended. In Linux, you can use your favorite package manager.
         git fetch cloudburst master
         git pull cloudburst master --squash --allow-unrelated-histories
 
+
    b. use an existing github repo. Use `git subtree` to clone the cloudburst repo as a directory 
    subtree in your repo. From a command prompt in your repo, first define a remote (shortcut):
 
 
         git remote add -f cloudburst https://github.com/bh3791/cloudburst.git
 
+
    - Next, add the subtree:
 
 
         git subtree add --prefix cloudburst cloudburst master --squash
+
 
    - To update the subtree later on:
 
 
         git fetch cloudburst master
         git subtree pull --prefix cloudburst cloudburst master --squash
+
+
+   - you can even push changes back up to the remote cloudburst repo, being careful to merge
+     any customizations. This is safest to do if you first fork the cloudburst repo, push to your
+     fork, and then use a pull request to request the changes get into the main repo.
+
+
+         git subtree push --prefix=cloudburst https://github.com/<your_name>/cloudburst.git master --squash
+
+
+   - when you use subtree, you will get the default Makefile, Dockerfile and docker-compose.yml files in the cloudburst 
+     subdirectory. It is best to copy these files to your repo root directory, and then customize them,
+     or merge them with your existing files, rather than use them in-place.
 
 2. run the `aws configure` command to set up your security credentials. You will need to generate these in 
 the AWS console https://console.aws.amazon.com/iamv2/home#/users : user : security credentials : access keys
@@ -113,6 +130,7 @@ the AWS console https://console.aws.amazon.com/iamv2/home#/users : user : securi
         terraform init
         terraform plan
         terraform apply
+
 
 5. create one or more buckets to store input/output data e.g. 'projectx_test' 
 
