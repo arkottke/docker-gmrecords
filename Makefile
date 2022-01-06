@@ -1,11 +1,11 @@
-DEPLOYMENT_ID=cloudburst1
-AWS_ID=<your_aws_account_id_here>
+DEPLOYMENT_ID=haz1
+AWS_ID=582821174044
 AWS_REGION=us-west-1
 
 ECR_REPO_ID=$(DEPLOYMENT_ID)
 ECR_REPO_URL=$(AWS_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 
-build: 
+build:
 	docker compose build $(DEPLOYMENT_ID)
 
 run: build
@@ -18,7 +18,7 @@ terraform:
 	cd terraform
 	terraform apply
 	cd ..
-	
+
 push: build
 	aws ecr get-login-password --region $(AWS_REGION) | docker login --username AWS --password-stdin $(ECR_REPO_URL)
 	docker tag $(DEPLOYMENT_ID):latest $(ECR_REPO_URL)/$(ECR_REPO_ID):latest

@@ -54,7 +54,15 @@ def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors:boo
         bucket: str = fetch['bucket']
         key: str = fetch['key']
         dest: str = fetch['dest']
-        expand: bool = fetch['expand']
+
+        expand = False
+        if 'expand' in fetch:
+            expand = fetch['expand']
+
+        if expand:
+            # allows the user to specify a directory for dest path
+            if key.endswith('.7z') and not dest.endswith('.7z'):
+                dest = os.path.join(dest, os.path.basename(key))
 
         # fetch file from S3
         rc = s3lib.get_files(bucket, key, dest, filter=None)
@@ -62,12 +70,9 @@ def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors:boo
         if exit_on_error and rc != 0:
             return_code = rc
             break
-            # unzip the inputs, prepare input files
         elif expand:
-            if dest.endswith('/'):
-                expand_to = dest
-            else:
-                expand_to = Path(dest).parent
+            # unzip the inputs, prepare input files
+            expand_to = Path(dest).parent
             
             return_code = ziplib.expand(dest, expand_to)
             if exit_on_error and return_code != 0:
@@ -177,7 +182,7 @@ def process_runner(process_name: str, item: int, items: int, cmd: str):
 # ************************************************************************************************************
 def manage_process(process_name: str, work_list: list, command: str, log_behavior: str, exit_on_error: bool):
     return_code = 0
-    log_folder = "./logs"
+    log_folder = "logs"
     counter = 0
 
     # read in the index file, which list the files to run
@@ -196,10 +201,9 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
         for inputFilePath in work_list:
             counter += 1
 
-            command = command.replace('[INPUT_FILE_PATH]', str(inputFilePath))
-            cmd = command
+            cmd = command.replace('[INPUT_FILE_PATH]', str(inputFilePath))
 
-            if log_behavior is None:
+            if log_behavior == 'capture':
                 log_file_str = str(inputFilePath).replace('/', '-').replace('.in', '').replace('.txt', '')
                 log_file_out = os.path.join(log_folder, process_name + "-" + log_file_str + ".log")
                 log_file_err = os.path.join(log_folder, process_name + "-" + log_file_str + ".err")
@@ -216,33 +220,36 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
                 print(f'error in process: {str(err)}')
                 if exit_on_error:
                     return_code = 244
-            
+
+    # remove any empty err files
+    files = Path(log_folder).glob(f"{process_name}-*.err")
+    for file in files:
+        if Path(file).stat().st_size == 0:
+            os.remove(file)
+
     if return_code != 0:
-        # post-process the error log files. Remove them if empty, report them if not
+        # post-process the error log files. report any non-empty error files
         print(f"error running {process_name}...")
         files = Path(log_folder).glob(f"{process_name}-*.err")
         logs = ''
         for file in files:
-            if Path(file).stat().st_size == 0:
-                os.remove(file)
-            else:
-                with open(file) as myfile:
-                    a_errs = myfile.readlines()
-                errs = '\n'.join(map(str, a_errs))
+            with open(file) as myfile:
+                a_errs = myfile.readlines()
+            errs = '\n'.join(map(str, a_errs))
 
-                log_file = str(file).replace('.err','.log')
-                if Path(log_file).stat().st_size > 0:
-                    with open(log_file) as myfile2:
-                        a_logs = myfile2.readlines()
-                    if len(a_logs) > 10:
-                        # only display the last 10 lines
-                        a_logs = a_logs[len(a_logs)-10:len(a_logs)-1]
-                    logs = '\n'.join(map(str, a_logs))
+            log_file = str(file).replace('.err','.log')
+            if Path(log_file).stat().st_size > 0:
+                with open(log_file) as myfile2:
+                    a_logs = myfile2.readlines()
+                if len(a_logs) > 10:
+                    # only display the last 10 lines
+                    a_logs = a_logs[len(a_logs)-10:len(a_logs)-1]
+                logs = '\n'.join(map(str, a_logs))
 
-                subject = f"errors found processing {process_name}, file: {file}"
-                message = f"contents: {logs}\nErrors:\n{errs}"
+            subject = f"errors found processing {process_name}, file: {file}"
+            message = f"contents: {logs}\nErrors:\n{errs}"
 
-                print(subject + ". " + message)
+            print(subject + ". " + message)
     return return_code
 
 
@@ -335,9 +342,16 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
         bucket = task['bucket']
         dest = task['dest']
         source = task['source']
-        compress: bool = task['compress']
 
-        remove_on_store = False
+        compress = False
+        if 'compress' in task:
+            compress = task['compress']
+
+        compressSubDirectories = False
+        if 'compressSubDirectories' in task:
+            compressSubDirectories = task['compressSubDirectories']
+
+        remove_on_store = True
         if 'removeOnStore' in task:
             remove_on_store = task['removeOnStore']
 
@@ -347,12 +361,50 @@ def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
                 return_code = 43
                 break
         else:
-            if Path(source).is_dir() and list(Path(source).glob('*')) == 0:
+            contents = []
+            is_empty = False
+            if Path(source).is_dir():
+                contents = list(Path(source).glob('*'))
+                if not compressSubDirectories:
+                    # is there anything to zip?
+                    is_empty = (len(contents) == 0)
+                else:
+                    # when compressing subdirectories, pre-check that at least one exists
+                    for item in contents:
+                        if item.is_dir() and len(list(item.glob('*'))) > 0:
+                            is_empty = False
+                            break
+
+            if is_empty:
                 print(f"skipping empty output directory for storage task [{name}]: {source}")
             else:
                 print(f"saving outputs: {source}")
 
-                if compress:
+                if compressSubDirectories and len(contents) > 0:
+                    for dir in contents:
+                        if dir.is_dir():
+                            src = str(dir)
+
+                            # trim trailing / character
+                            if src[-1] == '/':
+                                src = src[0:-1]
+                            tmp_zip = src + ".7z"
+
+                            rc = ziplib.compress(source_path=src, zip_path=tmp_zip)
+                            if exit_on_error and rc != 0:
+                                return_code = rc
+                                break
+
+                            key = Path(dest).joinpath(Path(tmp_zip).name)
+
+                            rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=tmp_zip)
+                            if exit_on_error and rc != 0:
+                                return_code = rc
+                                break
+
+                            if remove_on_store:
+                                os.remove(tmp_zip)
+                elif compress:
                     src = str(Path(source))
                     # trim trailing / character
                     if src[-1] == '/':
@@ -405,19 +457,21 @@ def get_validated_task_config(json_data_path: str):
     else:
         json_data_path = Path(json_data_path)
 
-    if json_data_path.exists() and json_schema_path.exists():
+    if json_data_path.exists():
         with open(json_data_path, 'r') as file:
             # do environment variable parameter substitution here
             tasks_json = os.path.expandvars(file.read())
             cfg = json.loads(tasks_json)
 
-        with open(json_schema_path, 'r') as file:
-            tasks_schema = file.read()
-            schema = json.loads(tasks_schema)
-
-        try:
-            jsonschema.validate(instance=cfg, schema=schema)
-        except jsonschema.exceptions.ValidationError as err:
-            print(f'error, cannot validate json schema: {err}')
-            return None
+        if not json_schema_path.exists():
+            print(f'warning, skipping validation of json against schema, cannot find schema file: {json_schema_path}')
+        else:
+            with open(json_schema_path, 'r') as file:
+                tasks_schema = file.read()
+                schema = json.loads(tasks_schema)
+            try:
+                jsonschema.validate(instance=cfg, schema=schema)
+            except jsonschema.exceptions.ValidationError as err:
+                print(f'error, cannot validate json schema: {err}')
+                return None
     return cfg

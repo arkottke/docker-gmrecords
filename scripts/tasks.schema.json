@@ -32,11 +32,11 @@
 				"type": "string"
 			  },
 			  "includeWhenMode": {
-				"description": "When provided, this fetch will be processed only if it matches the mode (optional)",
+				"description": "When provided, this fetch will be processed only if the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "excludeWhenMode": {
-				"description": "When provided, this fetch will not be processed when it matches the mode (optional)",
+				"description": "When provided, this fetch will not be processed when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "bucket": {
@@ -44,15 +44,15 @@
 				"type": "string"
 			  },
 			  "key": {
-				"description": "the key of the file to retrieve",
+				"description": "the key of the file to retrieve. When expand is false, this can be a prefix",
 				"type": "string"
 			  },
 			  "dest": {
-				"description": "the local file path that the file is copied to.",
+				"description": "the local file path that the file is copied to. A directory name is acceptable.",
 				"type": "string"
 			  },
 			  "expand": {
-				"description": "unzip the file. It will be expanded in place",
+				"description": "unzip the file. It will be expanded in place. Default is false",
 				"type": "boolean"
 			  },
 			  "excludeFilePattern": {
@@ -76,8 +76,7 @@
 			  "name",
 			  "bucket",
 			  "key",
-			  "dest",
-			  "expand"
+			  "dest"
 			]
 		  }
 		]
@@ -94,11 +93,11 @@
 				"type": "string"
 			  },
 			  "includeWhenMode": {
-				"description": "this item will be processed only when it matches the mode (optional)",
+				"description": "this item will be processed only when the mode is found in this string. It is possible to specify multiple modes as a delimited list.  (optional)",
 				"type": "string"
 			  },
 			  "excludeWhenMode": {
-				"description": "this item will not be processed when it matches the mode (optional)",
+				"description": "this item will not be processed when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "command": {
@@ -118,7 +117,7 @@
 				"type": "string"
 			  },
 			  "logBehavior": {
-				"description": "when any string is specified, do not capture and analyze log output (optional)",
+				"description": "when 'capture' is specified, redirect and analyze log output (optional)",
 				"type": "string"
 			  },
 			  "exitOnError": {
@@ -147,11 +146,11 @@
 				"type": "string"
 			  },
 			  "includeWhenMode": {
-				"description": "this item will be processed only when it matches the mode (optional)",
+				"description": "this item will be processed only when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "excludeWhenMode": {
-				"description": "this item will not be processed when it matches the mode (optional)",
+				"description": "this item will not be processed when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "inputFolder": {
@@ -204,11 +203,11 @@
 				"type": "string"
 			  },
 			  "includeWhenMode": {
-				"description": "this item will be processed only when it matches the mode (optional)",
+				"description": "this item will be processed only when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "excludeWhenMode": {
-				"description": "this item will not be processed when it matches the mode (optional)",
+				"description": "this item will not be processed when the mode is found in this string. It is possible to specify multiple modes as a delimited list. (optional)",
 				"type": "string"
 			  },
 			  "bucket": {
@@ -224,11 +223,15 @@
 				"type": "string"
 			  },
 			  "compress": {
-				"description": "zip the source, or not",
+				"description": "zip the source, or not, default is false",
+				"type": "boolean"
+			  },
+			  "compressSubDirectories": {
+				"description": "zip the source subdirectories, default is false",
 				"type": "boolean"
 			  },
 			  "removeOnStore": {
-				"description": "remove the zip file when it has been copied",
+				"description": "remove the zip file when it has been copied, default is true",
 				"type": "boolean"
 			  },
 			  "exitOnError": {
@@ -244,8 +247,7 @@
 			  "name",
 			  "bucket",
 			  "source",
-			  "dest",
-			  "compress"
+			  "dest"
 			]
 		  }
 		]

@@ -1,6 +1,6 @@
 {
     "programName" : "run PS",
-    "$schema": "./tasks.schema.json",
+    "$schema": "tasks.schema.json",
     "itemName" : "none",
     "fetch": [
         {
