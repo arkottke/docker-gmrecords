@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 # Compresses a 7zip archive, providing exception handling and logging
-def compress(zip_path: Path, source_path: Path):
+def compress(zip_path:Path, source_path:Path):
     zip_path = Path(zip_path)
     source_path = Path(source_path)
 
@@ -29,7 +29,7 @@ def compress(zip_path: Path, source_path: Path):
 
 
 # expands a 7z archive from path to destination
-def expand(source_path: str, destination_path: str):
+def expand(source_path:str, destination_path:str):
     print(f'expanding: {source_path} to {destination_path}')
     os.makedirs(destination_path, exist_ok=True)
 

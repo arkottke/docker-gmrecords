@@ -20,7 +20,7 @@ EXIT_ON_ERROR = True
 
 
 # get the input data for all the sites we are going to process
-def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors: bool = False):
+def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors:bool = False):
     return_code = 0
 
     # TODO: move elsewhere or change default
@@ -72,29 +72,17 @@ def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors: bo
             break
         elif expand:
             # unzip the inputs, prepare input files
-            is_expanded = False
-            if dest.endswith('.7z'):
-                expand_to = Path(dest).parent
-            else:
-                # if dest does not end with 7z, it may be a directory tree with 7z files to expand
-                p_dest = Path(dest)
-                if p_dest.is_dir():
-                    for zip in p_dest.rglob('*.7z'):
-                        return_code = ziplib.expand(zip, zip.parent)
-                        if exit_on_error and return_code != 0:
-                            break
-                        elif remove_zips:
-                            zip.unlink()
-                    is_expanded = True
-
-            if not is_expanded:
-                return_code = ziplib.expand(dest, expand_to)
-
-                if exit_on_error and return_code != 0:
-                    break
-                elif remove_zips:
-                    if len(dest) > 3 and dest[-3:] == '.7z':
-                        os.remove(dest)
+            expand_to = Path(dest).parent
+            
+            return_code = ziplib.expand(dest, expand_to)
+            if exit_on_error and return_code != 0:
+                break
+            elif remove_zips:
+                if len(dest) > 3 and dest[-3:] == '.7z':
+                    os.remove(dest)
+                elif dest.endswith('/'):
+                    for file in Path(dest).glob('*.7z'):
+                        file.unlink()
 
         if 'excludeFilePattern' in fetch:
             patterns = fetch['excludeFilePattern']
@@ -106,7 +94,7 @@ def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors: bo
     return return_code
 
 
-def run_tasks(process_list: list, mode: str, prior_errors: bool = False):
+def run_tasks(process_list: list, mode: str, prior_errors:bool = False):
     logFolder = "./logs"
     return_code = 0
     
@@ -265,7 +253,7 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
     return return_code
 
 
-def move_files(move_tasks: list, mode: str, prior_errors: bool = False):
+def move_files(move_tasks: list, mode: str, prior_errors:bool = False):
     return_code = 0
     
     for task in move_tasks:
@@ -323,7 +311,7 @@ def move_files(move_tasks: list, mode: str, prior_errors: bool = False):
     return return_code
 
 
-def process_store(tasks_store: list, mode: str, prior_errors: bool = False):
+def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
     return_code = 0
 
     for task in tasks_store:
@@ -359,9 +347,9 @@ def process_store(tasks_store: list, mode: str, prior_errors: bool = False):
         if 'compress' in task:
             compress = task['compress']
 
-        compress_sub_directories = False
+        compressSubDirectories = False
         if 'compressSubDirectories' in task:
-            compress_sub_directories = task['compressSubDirectories']
+            compressSubDirectories = task['compressSubDirectories']
 
         remove_on_store = True
         if 'removeOnStore' in task:
@@ -377,7 +365,7 @@ def process_store(tasks_store: list, mode: str, prior_errors: bool = False):
             is_empty = False
             if Path(source).is_dir():
                 contents = list(Path(source).glob('*'))
-                if not compress_sub_directories:
+                if not compressSubDirectories:
                     # is there anything to zip?
                     is_empty = (len(contents) == 0)
                 else:
@@ -392,7 +380,7 @@ def process_store(tasks_store: list, mode: str, prior_errors: bool = False):
             else:
                 print(f"saving outputs: {source}")
 
-                if compress_sub_directories and len(contents) > 0:
+                if compressSubDirectories and len(contents) > 0:
                     for dir in contents:
                         if dir.is_dir():
                             src = str(dir)

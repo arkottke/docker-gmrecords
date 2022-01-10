@@ -45,38 +45,35 @@ def main():
         boto3.setup_default_session(region_name=aws_region)
 
         exit_code = 0
-        errors_found = False
         for element in cfg:
             try:
                 if element == 'fetch':
                     fetches = cfg[element]
-                    exit_code = fwlib.process_fetches(mode_str, tmp_zip_dir, fetches, errors_found)
+                    exit_code = fwlib.process_fetches(mode_str, tmp_zip_dir, fetches, exit_code != 0)
 
                     if disk_stats:
                         os.system("echo disk space: && df -h && echo disk usage: && du -ch")
                 elif element == 'tasks':
                     tasks_processing = cfg[element]
-                    exit_code = fwlib.run_tasks(tasks_processing, mode_str, errors_found)
+                    exit_code = fwlib.run_tasks(tasks_processing, mode_str, exit_code != 0)
 
                 elif element == 'move':
                     moves = cfg[element]
-                    exit_code = fwlib.move_files(moves, mode_str, errors_found)
+                    exit_code = fwlib.move_files(moves, mode_str, exit_code != 0)
 
                 elif element == 'store':
                     if not local_mode:
                         tasks_store = cfg[element]
-                        exit_code = fwlib.process_store(tasks_store, mode_str, errors_found)
+                        exit_code = fwlib.process_store(tasks_store, mode_str, exit_code != 0)
                     else:
                         exit_code = 0
                         print('skipping store tasks in local mode')
                 else:
                     exit_code = 0
+
             except Exception as err:
                 print(f"unexpected error: {str(err)}")
                 exit_code = 4
-
-            if exit_code != 0:
-                errors_found = True
 
         print("processing complete")
 
