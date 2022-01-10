@@ -18,6 +18,7 @@ group1 = parser.add_mutually_exclusive_group()
 group1.add_argument('-workitems', dest='items', help='An individual, list or range of work items, e.g. "item1"')
 group1.add_argument('-workitemfile', dest='itemListFile', type=argparse.FileType('r'), help='A file containing the list of items to run, each line in the format needed by the application', )
 
+
 # starts batch jobs in AWS using the list of work items specified
 def main(args):
     if args.jobDef is None:
@@ -43,8 +44,9 @@ def main(args):
         print("Error: must provide these params: workitems, workitemfile")
         exit(-1)
 
-    if not args.name_values is None:
-        if any(len(kv) < 2 for kv in args.name_values): raise ValueError('-name-value must be given in the form "KEY=VALUE"')
+    if args.name_values is not None:
+        if any(len(kv) < 2 for kv in args.name_values):
+            raise ValueError('-name-value must be given in the form "KEY=VALUE"')
 
     if not args.apply:
         print('previewing job startup...') 

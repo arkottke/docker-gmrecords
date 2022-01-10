@@ -109,7 +109,7 @@ is recommended. In Linux, you can use your favorite package manager.
 
 
    - you can even push changes back up to the remote cloudburst repo, being careful to merge
-     any customizations. This is safest to do if you first fork the cloudburst repo, push to your
+     any customizations. This is safest to do if you **first fork the cloudburst repo**, push to your
      fork, and then use a pull request to request the changes get into the main repo.
 
 
