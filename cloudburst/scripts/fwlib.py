@@ -20,13 +20,20 @@ EXIT_ON_ERROR = True
 
 
 # get the input data for all the sites we are going to process
-def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
+def process_fetches(mode: str, tmp_zip_dir: str, fetches: list, prior_errors:bool = False):
     return_code = 0
 
     # TODO: move elsewhere or change default
     remove_zips = True
 
     for fetch in fetches:
+        required = False
+        if 'required' in fetch:
+            required = fetch['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in fetch:
             exit_on_error = fetch['exitOnError']
@@ -47,19 +54,35 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
         bucket: str = fetch['bucket']
         key: str = fetch['key']
         dest: str = fetch['dest']
-        expand: bool = fetch['expand']
+
+        expand = False
+        if 'expand' in fetch:
+            expand = fetch['expand']
+
+        if expand:
+            # allows the user to specify a directory for dest path
+            if key.endswith('.7z') and not dest.endswith('.7z'):
+                dest = os.path.join(dest, os.path.basename(key))
 
         # fetch file from S3
-        return_code = s3lib.copy_s3_object(bucket, key, dest)
-        if exit_on_error and return_code != 0:
+        rc = s3lib.get_files(bucket, key, dest, filter=None)
+        # return_code = s3lib.copy_s3_object(bucket, key, dest)
+        if exit_on_error and rc != 0:
+            return_code = rc
             break
-            # unzip the inputs, prepare input files
         elif expand:
-            ret = ziplib.expand(dest, Path(dest).parent)
+            # unzip the inputs, prepare input files
+            expand_to = Path(dest).parent
+            
+            return_code = ziplib.expand(dest, expand_to)
             if exit_on_error and return_code != 0:
                 break
             elif remove_zips:
-                os.remove(dest)
+                if len(dest) > 3 and dest[-3:] == '.7z':
+                    os.remove(dest)
+                elif dest.endswith('/'):
+                    for file in Path(dest).glob('*.7z'):
+                        file.unlink()
 
         if 'excludeFilePattern' in fetch:
             patterns = fetch['excludeFilePattern']
@@ -68,16 +91,24 @@ def get_input_files(mode: str, tmp_zip_dir: str, fetches: list):
                 print(f'removing file: {file}')
                 os.remove(file)
 
-        return return_code
+    return return_code
 
 
-def run_tasks(process_list: list, mode: str):
+def run_tasks(process_list: list, mode: str, prior_errors:bool = False):
     logFolder = "./logs"
-
+    return_code = 0
+    
     # create logs folder if it doesn't exist
     os.makedirs(logFolder, exist_ok=True)
 
     for process in process_list:
+        required = False
+        if 'required' in process:
+            required = process['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in process:
             exit_on_error = process['exitOnError']
@@ -120,8 +151,8 @@ def run_tasks(process_list: list, mode: str):
 
             if len(work_list) == 0:
                 print(f"Error preparing {proc_name} work list. No files found in {file_pattern}")
-                return_code = 232
                 if exit_on_error:
+                    return_code = 232
                     break
 
         log_behavior = None
@@ -129,9 +160,10 @@ def run_tasks(process_list: list, mode: str):
             log_behavior = process['logBehavior']
 
         # run the current process
-        return_code = manage_process(proc_name, work_list, process["command"], log_behavior, exit_on_error)
-        if exit_on_error and return_code != 0:
-            print("Errors found processing " + proc_name + ", ending early")
+        rc = manage_process(proc_name, work_list, process["command"], log_behavior, exit_on_error)
+        if exit_on_error and rc != 0:
+            print("errors found processing " + proc_name + ", ending early")
+            return_code = rc
             break
 
     return return_code
@@ -142,7 +174,6 @@ def process_runner(process_name: str, item: int, items: int, cmd: str):
     escapedCmd = cmd.replace("\n", "\\n")
     print(f'starting: [{process_name}] #{item}/{items} [{escapedCmd}]')
     return subprocess.run(cmd, shell=True)
-    # print(f'stopping: #{item}')
 
 
 # ************************************************************************************************************
@@ -151,7 +182,7 @@ def process_runner(process_name: str, item: int, items: int, cmd: str):
 # ************************************************************************************************************
 def manage_process(process_name: str, work_list: list, command: str, log_behavior: str, exit_on_error: bool):
     return_code = 0
-    log_folder = "./logs"
+    log_folder = "logs"
     counter = 0
 
     # read in the index file, which list the files to run
@@ -170,10 +201,9 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
         for inputFilePath in work_list:
             counter += 1
 
-            command = command.replace('[INPUT_FILE_PATH]', str(inputFilePath))
-            cmd = command
+            cmd = command.replace('[INPUT_FILE_PATH]', str(inputFilePath))
 
-            if log_behavior is None:
+            if log_behavior == 'capture':
                 log_file_str = str(inputFilePath).replace('/', '-').replace('.in', '').replace('.txt', '')
                 log_file_out = os.path.join(log_folder, process_name + "-" + log_file_str + ".log")
                 log_file_err = os.path.join(log_folder, process_name + "-" + log_file_str + ".err")
@@ -182,33 +212,58 @@ def manage_process(process_name: str, work_list: list, command: str, log_behavio
             futures.append(executor.submit(process_runner, process_name, counter, len(work_list), cmd))
 
         for future in concurrent.futures.as_completed(futures):
-            process_result = future.result()
-            # print(processResult)
-            if exit_on_error and process_result.returncode != 0:
-                return_code = process_result.returncode
-                break
+            try:
+                process_result = future.result()
+                if exit_on_error and process_result.returncode != 0:
+                    return_code = process_result.returncode
+            except Exception as err:
+                print(f'error in process: {str(err)}')
+                if exit_on_error:
+                    return_code = 244
+
+    # remove any empty err files
+    files = Path(log_folder).glob(f"{process_name}-*.err")
+    for file in files:
+        if Path(file).stat().st_size == 0:
+            os.remove(file)
 
     if return_code != 0:
-        # post-process the error log files. Remove them if empty, report them if not
+        # post-process the error log files. report any non-empty error files
         print(f"error running {process_name}...")
         files = Path(log_folder).glob(f"{process_name}-*.err")
-
+        logs = ''
         for file in files:
-            if Path(file).stat().st_size == 0:
-                os.remove(file)
-            else:
-                with open(file) as myfile:
-                    a_errs = myfile.readlines()
-                sErrs = '\n'.join(map(str, a_errs))
-                subject = f"errors found processing {process_name}, file: {file}"
-                message = "contents: " + sErrs
+            with open(file) as myfile:
+                a_errs = myfile.readlines()
+            errs = '\n'.join(map(str, a_errs))
 
-                print(subject + ". " + message)
+            log_file = str(file).replace('.err','.log')
+            if Path(log_file).stat().st_size > 0:
+                with open(log_file) as myfile2:
+                    a_logs = myfile2.readlines()
+                if len(a_logs) > 10:
+                    # only display the last 10 lines
+                    a_logs = a_logs[len(a_logs)-10:len(a_logs)-1]
+                logs = '\n'.join(map(str, a_logs))
+
+            subject = f"errors found processing {process_name}, file: {file}"
+            message = f"contents: {logs}\nErrors:\n{errs}"
+
+            print(subject + ". " + message)
     return return_code
 
 
-def move_files(move_tasks: list, mode: str):
+def move_files(move_tasks: list, mode: str, prior_errors:bool = False):
+    return_code = 0
+    
     for task in move_tasks:
+        required = False
+        if 'required' in task:
+            required = task['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in task:
             exit_on_error = task['exitOnError']
@@ -237,7 +292,6 @@ def move_files(move_tasks: list, mode: str):
             for includePattern in include_file_pattern:
                 for file in Path(input_folder).rglob(includePattern):
                     if exclude_file_pattern is None or not (True in [file.match(p) for p in exclude_file_pattern]):
-
                         try:
                             os.makedirs(output_folder, exist_ok=True)
                             print(f'moving {file} to {output_folder}')
@@ -254,12 +308,20 @@ def move_files(move_tasks: list, mode: str):
                                 return 213
                             else:
                                 print(f"warning: {err_str}")
+    return return_code
 
 
-def prepare_outputs(tasks_store: list, mode: str):
+def process_store(tasks_store: list, mode: str, prior_errors:bool = False):
     return_code = 0
 
     for task in tasks_store:
+        required = False
+        if 'required' in task:
+            required = task['required']
+        # skip a store task when there are prior errors UNLESS task is required
+        if not required and prior_errors:
+            continue
+
         exit_on_error = EXIT_ON_ERROR
         if 'exitOnError' in task:
             exit_on_error = task['exitOnError']
@@ -280,38 +342,105 @@ def prepare_outputs(tasks_store: list, mode: str):
         bucket = task['bucket']
         dest = task['dest']
         source = task['source']
-        compress: bool = task['compress']
 
-        remove_on_store = False
+        compress = False
+        if 'compress' in task:
+            compress = task['compress']
+
+        compressSubDirectories = False
+        if 'compressSubDirectories' in task:
+            compressSubDirectories = task['compressSubDirectories']
+
+        remove_on_store = True
         if 'removeOnStore' in task:
             remove_on_store = task['removeOnStore']
 
-        if Path(source).exists():
-            if len(list(Path(source).glob('*'))) == 0:
+        if not Path(source).exists():
+            print(f'error: source path for store task [{name}] does not exists: {source}')
+            if exit_on_error:
+                return_code = 43
+                break
+        else:
+            contents = []
+            is_empty = False
+            if Path(source).is_dir():
+                contents = list(Path(source).glob('*'))
+                if not compressSubDirectories:
+                    # is there anything to zip?
+                    is_empty = (len(contents) == 0)
+                else:
+                    # when compressing subdirectories, pre-check that at least one exists
+                    for item in contents:
+                        if item.is_dir() and len(list(item.glob('*'))) > 0:
+                            is_empty = False
+                            break
+
+            if is_empty:
                 print(f"skipping empty output directory for storage task [{name}]: {source}")
             else:
                 print(f"saving outputs: {source}")
 
-                if compress:
-                    src_dir = str(Path(source))
-                    # trim trailing / character
-                    if src_dir[-1] == '/':
-                        src_dir = src_dir[0:-1]
-                    tmpZip = src_dir + ".7z"
+                if compressSubDirectories and len(contents) > 0:
+                    for dir in contents:
+                        if dir.is_dir():
+                            src = str(dir)
 
-                    return_code = ziplib.compress(destination_path=src_dir, source_path=tmpZip)
-                    if exit_on_error and return_code != 0:
+                            # trim trailing / character
+                            if src[-1] == '/':
+                                src = src[0:-1]
+                            tmp_zip = src + ".7z"
+
+                            rc = ziplib.compress(source_path=src, zip_path=tmp_zip)
+                            if exit_on_error and rc != 0:
+                                return_code = rc
+                                break
+
+                            key = Path(dest).joinpath(Path(tmp_zip).name)
+
+                            rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=tmp_zip)
+                            if exit_on_error and rc != 0:
+                                return_code = rc
+                                break
+
+                            if remove_on_store:
+                                os.remove(tmp_zip)
+                elif compress:
+                    src = str(Path(source))
+                    # trim trailing / character
+                    if src[-1] == '/':
+                        src = src[0:-1]
+                    tmp_zip = src + ".7z"
+
+                    rc = ziplib.compress(source_path=src, zip_path=tmp_zip)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
-                    return_code = s3lib.write_s3_object(bucket, dest, tmpZip)
-                    if exit_on_error and return_code != 0:
+                    if dest[-1] == '/':
+                        key = Path(dest).joinpath(Path(tmp_zip).name)
+                    else:
+                        key = dest
+
+                    rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=tmp_zip)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
                     if remove_on_store:
-                        os.remove(tmpZip)
+                        os.remove(tmp_zip)
                 else:
-                    return_code = s3lib.put_files(bucket, source, dest)
-                    if exit_on_error and return_code != 0:
+                    if Path(source).is_dir():
+                        rc = s3lib.put_files(bucket_name=bucket, local_folder=source, prefix=dest)
+                    else:
+                        # handle case where a directory name is specified for the destination
+                        if dest[-1] == '/':
+                            key = Path(dest).joinpath(Path(source).name)
+                        else:
+                            key = dest
+
+                        rc = s3lib.write_s3_object(bucket_name=bucket, key=str(key), file=source)
+                    if exit_on_error and rc != 0:
+                        return_code = rc
                         break
 
     return return_code
@@ -328,19 +457,21 @@ def get_validated_task_config(json_data_path: str):
     else:
         json_data_path = Path(json_data_path)
 
-    if json_data_path.exists() and json_schema_path.exists():
+    if json_data_path.exists():
         with open(json_data_path, 'r') as file:
             # do environment variable parameter substitution here
             tasks_json = os.path.expandvars(file.read())
             cfg = json.loads(tasks_json)
 
-        with open(json_schema_path, 'r') as file:
-            tasks_schema = file.read()
-            schema = json.loads(tasks_schema)
-
-        try:
-            jsonschema.validate(instance=cfg, schema=schema)
-        except jsonschema.exceptions.ValidationError as err:
-            print(f'error, cannot validate json schema: {err}')
-            return None
+        if not json_schema_path.exists():
+            print(f'warning, skipping validation of json against schema, cannot find schema file: {json_schema_path}')
+        else:
+            with open(json_schema_path, 'r') as file:
+                tasks_schema = file.read()
+                schema = json.loads(tasks_schema)
+            try:
+                jsonschema.validate(instance=cfg, schema=schema)
+            except jsonschema.exceptions.ValidationError as err:
+                print(f'error, cannot validate json schema: {err}')
+                return None
     return cfg

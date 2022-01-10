@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="add correct output folder">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-example1.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-example1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-fetch-store.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-fetch-store.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/tasks-haz-dams.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/tasks-haz-dams.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_clilib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_clilib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_fwlib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_fwlib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_s3lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_s3lib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/extras/test_ziplib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/extras/test_ziplib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/fwlib.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/fwlib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/tasks.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudburst/scripts/tasks.schema.json" beforeDir="false" afterPath="$PROJECT_DIR$/cloudburst/scripts/tasks.schema.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="22foe1rQsjoFeN00UsU5lWW40RD" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c137927e-a56b-41ae-998f-2acb53ba395b" name="Changes" comment="" />
+      <created>1640238094621</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1640238094621</updated>
+    </task>
+    <task id="LOCAL-00001" summary="bring in pycharm files">
+      <created>1640238924712</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1640238924712</updated>
+    </task>
+    <task id="LOCAL-00002" summary="bring in pycharm files">
+      <created>1640315332943</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1640315332943</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="bring in pycharm files" />
+    <option name="LAST_COMMIT_MESSAGE" value="bring in pycharm files" />
+  </component>
+</project>

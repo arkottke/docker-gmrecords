@@ -14,8 +14,6 @@ services:
             - MODE_STR=
             - LOCAL_MODE=0
             - WORK_ITEM=test1
-            # - TASKS_PATH=/opt/pge-fw/tasks-example1.json
+            # overrides default - TASKS_PATH=/opt/pge-fw/tasks-example1.json
         volumes:
-            - ~/.aws/credentials:/home/ubuntu/.aws/credentials:ro
-        # entrypoint: /bin/bash
-        # run with: docker compose run test
+            - ~/.aws/credentials:/root/.aws/credentials:ro

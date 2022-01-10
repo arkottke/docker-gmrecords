@@ -1,8 +1,10 @@
-# PG&E CloudBurst Framework
+# PG&E Cloudburst Framework
 
-The PGE CloudBurst Framework is used to run any program at scale using Amazon AWS Batch. It can be used to run a series of programs across tens, hundreds or even thousands of servers concurrently. The framework makes it easy to run a process that gathers input data, processes it, and stores results back to S3 for later analysis.
+The PGE Cloudburst Framework is used to automate the execution of programs and scripts at scale using Amazon 
+AWS Batch. It can be used to run a series of programs across tens, hundreds or even thousands of servers 
+concurrently. The framework makes it easy to run a process that gathers input data, processes it, and stores
+results for later analysis.
 
-## QuickStart Guide
 To fully use the framework, you will need to install and configure a number of tools.
 - Git, to interact with github
 - An editor, such as JetBrains PyCharm or Microsoft Visual Studio Code
@@ -11,44 +13,6 @@ To fully use the framework, you will need to install and configure a number of t
 - Python 3.9 or higher, with a couple of python modules
 
 The installation steps are documented below.
-
-## What's in this Repo?
-The repository is made up of the following folders and files:
-
-- main folder
-    - `Makefile`: contains build targets to build, run, test and push the container image.
-    - `Dockerfile`: the docker file defines the contents of the container.
-    - `docker-compose.yml` is used for building, running and testing the docker container.
-
-- scripts. This contains the python scripts containing the framework scripts, and the json files used to configure what processes will occur on the server. Both the server and client scripts are in here. 
-    - The client-side scripts are as follows. Examples of their use are found below:
-        - `compress_inputs.py`: zip a set of input files from one directory structure into another
-        - `upload_inputs.py`: upload input files to S3
-        - `start_jobs.py`: start batch jobs using an input file, s3 folder, or a string specified on the command line
-        - `get_outputs.py`: download output files from S3
-        - `unzip_folder.py`: unzip files (typically output files) in a folder hierarchy
-  
-    - The json files:
-        - `tasks.json`: contains a description of the process (that you define).
-        - `tasks.schema.json`: this file documents and is used to validate the content of `tasks.json` before execution.
-  
-    - The server script (entrypoint) is:
-        - `fw_entrypoint.py`: the main server-side script, which executes the contents of the tasks.json file
-
-    - framework functions are stored in the following library files:
-        - `fwlib.py`: mainly contains server-side functions
-        - `clilib.py`: client-side functions
-        - `s3lib.py`: s3 functions
-        - `ziplib.py`: functions to zip/unzip with 7zip
-
-- terraform. This folder contains configuration files for terraform, the tool we use to set up and configure the cloud infrastructure for running our containers.
-    - `terraform.tfvars`: variables are customized for each project in this file 
-    - `variables.tf`: defines the variables used in the terraform project
-    - `main.tf`: the main terraform file, specifies versions and modules
-    - `networking.tf`: AWS networking configuration
-    - `iam.tf`: security identity configuration
-    - `batch.tf`: aws batch-related configuration
-
 
 ## How to Get Started
 - decide on a unit of work. For instance, a single run of a single program, or a sequence of programs operating on 
@@ -60,9 +24,15 @@ hours to run.
 - define a parameter (or several parameters) to control the execution.
 
 ### Install the tools
-installation involves a number of packages. These can be either downloaded as installers from the web or installed by a command-line tool. For command-line 
-installation on the mac, homebrew is recommended. On the pc, chocolatey is recommended. In Linux, you can use your favorite package manager.
+installation involves a number of packages. These can be either downloaded as installers from the web or installed
+by a command-line tool. For command-line installation on the mac, homebrew is recommended. On the pc, chocolatey 
+is recommended. In Linux, you can use your favorite package manager.
 
+0. on windows?
+    - install chocolatey
+      - https://chocolatey.org
+    - install make: from an **admin powershell prompt**:
+      - `choco install make`
 1. install git
     - https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
     - mac: (included when you install xcode command line tools)
@@ -95,10 +65,65 @@ installation on the mac, homebrew is recommended. On the pc, chocolatey is recom
     - Microsoft Visual Studio Code https://code.visualstudio.com/
 
 ### Configure the environment
-1. run the `aws configure` command to set up your security credentials. You will need to generate these in 
+1. clone (fork) or subtree the cloudburst repo
+
+   a. are you creating a new repo? you can fork or clone the cloudburst repo 
+   and use this structure to develop your scripts. You can do this from the github website or at the
+   command line:
+
+
+        git clone https://github.com/bh3791/cloudburst.git my-project
+
+
+   - Next, add a remote (shortcut):
+
+
+        git remote add -f cloudburst https://github.com/bh3791/cloudburst.git
+
+
+   - To update the subtree later on:
+
+
+        git fetch cloudburst master
+        git pull cloudburst master --squash --allow-unrelated-histories
+
+
+   b. use an existing github repo. Use `git subtree` to clone the cloudburst repo as a directory 
+   subtree in your repo. From a command prompt in your repo, first define a remote (shortcut):
+
+
+        git remote add -f cloudburst https://github.com/bh3791/cloudburst.git
+
+
+   - Next, add the subtree:
+
+
+        git subtree add --prefix cloudburst cloudburst master --squash
+
+
+   - To update the subtree later on:
+
+
+        git fetch cloudburst master
+        git subtree pull --prefix cloudburst cloudburst master --squash
+
+
+   - you can even push changes back up to the remote cloudburst repo, being careful to merge
+     any customizations. This is safest to do if you **first fork the cloudburst repo**, push to your
+     fork, and then use a pull request to request the changes get into the main repo.
+
+
+         git subtree push --prefix=cloudburst https://github.com/<your_name>/cloudburst.git master --squash
+
+
+   - when you use subtree, you will get the default Makefile, Dockerfile and docker-compose.yml files in the cloudburst 
+     subdirectory. It is best to copy these files to your repo root directory, and then customize them,
+     or merge them with your existing files, rather than use them in-place.
+
+2. run the `aws configure` command to set up your security credentials. You will need to generate these in 
 the AWS console https://console.aws.amazon.com/iamv2/home#/users : user : security credentials : access keys
-2. edit the Makefile, naming the TAG and REPO_ID 'projectX' and your AWS_ID (account id) at the top 
-3. configure terraform by editing the `terraform.tfvars` file, naming the deployment 'projectX'. Create the infrastructure when you are satisfied. The project is initially configured to work out of the box in the us-west-1 region. To modify it for another region, networking.tf would need to be edited to apply the correct availability zones and subnets.
+3. edit the `Makefile`, naming the TAG and REPO_ID 'projectX' and your AWS_ID (account id) at the top 
+4. configure terraform by editing the `terraform.tfvars` file, naming the deployment 'projectX'. Create the infrastructure when you are satisfied. The project is initially configured to work out of the box in the us-west-1 region. To modify it for another region, networking.tf would need to be edited to apply the correct availability zones and subnets.
 
 
         cd terraform
@@ -106,37 +131,12 @@ the AWS console https://console.aws.amazon.com/iamv2/home#/users : user : securi
         terraform plan
         terraform apply
 
-4. create one or more buckets to store input/output data e.g. 'projectx_test' 
+
+5. create one or more buckets to store input/output data e.g. 'projectx_test' 
 
 
         aws s3 mb projectx_test
 
-
-5. plan your github integration
-
-   a. Create a new repo, you can alternately fork/clone the cloudburst repo 
-   and use this to develop your scripts. You can do this on the github site or at the
-   command line:
-
-
-        git clone https://github.com/bh3791/cloudburst.git my-cloudburst
-
-   b. use your existing github repo. Use `git subtree` to copy the cloudburst repo as a directory 
-   subtree in your repo. From a command prompt in your repo, firs define a remote (shortcut):
-
-
-        git remote add -f cloudburst https://github.com/bh3791/cloudburst.git
-
-   - Next, add the subtree:
-
-
-        git subtree add --prefix cloudburst cloudburst master --squash
-
-   - To update the subtree later on:
-
-
-        git fetch cloudburst master
-        git subtree pull --prefix cloudburst cloudburst master --squash
 
 ### Configure your process 
 The easiest way to approach this is to start by creating a functioning docker container

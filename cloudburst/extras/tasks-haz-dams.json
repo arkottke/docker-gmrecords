@@ -1,6 +1,6 @@
 {
     "programName" : "dam_hazard_analysis",
-    "$schema": "./tasks.schema.json",
+    "$schema": "tasks.schema.json",
     "itemName" : "${WORK_ITEM}",
     "supportedModes" : ["full", "haz-only", "post"],
     "fetch" : [
@@ -40,7 +40,7 @@
         {
             "name" : "haz",
             "excludeWhenMode" : "post",
-            "command" : "echo '0\n0\n[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz",
+            "command" : "echo '0\n0\n[INPUT_FILE_PATH]' | /opt/haz/haz",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "haz.in",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -48,7 +48,7 @@
         {
             "name" : "haz-back-only",
             "excludeWhenMode" : "post",
-            "command" : "echo '0\n0\n[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz",
+            "command" : "echo '0\n0\n[INPUT_FILE_PATH]' | /opt/haz/haz",
             "inputFolder" : "./Sites/",
             "inputFilePattern" : "hazbackonly.in",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -56,7 +56,7 @@
         {
             "name" : "fractiles",
             "excludeWhenMode" : "haz-only",
-            "command" : "echo '[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz-fractiles",
+            "command" : "echo '[INPUT_FILE_PATH]' | /opt/haz/haz-fractiles",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "fractile.in",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -64,7 +64,7 @@
         {
             "name" : "disagg",
             "excludeWhenMode" : "haz-only",
-            "command" : "echo '[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz-uhs-disagg",
+            "command" : "echo '[INPUT_FILE_PATH]' | /opt/haz/haz-uhs-disagg",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "deagg.in",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -72,7 +72,7 @@
         {
             "name" : "haz-deter",
             "excludeWhenMode" : "haz-only",
-            "command" : "echo '0\n3\n[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz",
+            "command" : "echo '0\n3\n[INPUT_FILE_PATH]' | /opt/haz/haz",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "deter.in",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -80,7 +80,7 @@
         {
             "name" : "haz-tornado-gmc",
             "excludeWhenMode" : "haz-only",
-            "command" : "echo '0\n[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz-tornado-gmc",
+            "command" : "echo '0\n[INPUT_FILE_PATH]' | /opt/haz/haz-tornado-gmc",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "gmctornado.txt",
             "outputFolder" : "./Output/${WORK_ITEM}"
@@ -88,7 +88,7 @@
         {
             "name" : "haz-tornado-ssc",
             "excludeWhenMode" : "haz-only",
-            "command" : "echo '[INPUT_FILE_PATH]' | /opt/pge-fw/bin/haz-tornado-ssc",
+            "command" : "echo '[INPUT_FILE_PATH]' | /opt/haz/haz-tornado-ssc",
             "inputFolder" : "./Sites/${WORK_ITEM}",
             "inputFilePattern" : "ssctornado.txt",
             "outputFolder" : "./Output/$Dam{SITE_NAME}/Period${PERIOD_ID}"
@@ -106,8 +106,7 @@
             "name" : "move-out1-files",
             "inputFolder" : "./Output/${WORK_ITEM}",
             "includeFilePattern" : ["*.out1"],
-            "excludeFilePattern" : ["*backonly.out1"],
-            "outputFolder" : "/tmp/Output/${WORK_ITEM}_out1",
+            "outputFolder" : "/tmp/Output/${WORK_ITEM}",
             "exitOnError": false
         }
     ],
@@ -122,8 +121,9 @@
         },
         {
             "name" : "store-out1-files",
+            "excludeWhenMode" : "post",
             "bucket" : "${BUCKET_NAME}",
-            "source" : "/tmp/Output/${WORK_ITEM}_out1",
+            "source" : "/tmp/Output/${WORK_ITEM}",
             "dest" : "output/${WORK_ITEM}_out1.7z",
             "compress" : true,
             "removeOnStore" : true,
@@ -136,7 +136,8 @@
             "dest" : "logs/${WORK_ITEM}.7z",
             "compress" : true,
             "removeOnStore" : false,
-            "exitOnError": false
+            "exitOnError": false,
+            "required": true
         }
     ]
 }

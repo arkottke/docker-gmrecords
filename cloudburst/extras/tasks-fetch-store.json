@@ -1,0 +1,32 @@
+{
+    "programName" : "run PS",
+    "$schema": "tasks.schema.json",
+    "itemName" : "none",
+    "fetch": [
+        {
+            "name" : "fetch-1",
+            "bucket" : "${BUCKET_NAME}",
+            "key" : "test1/",
+            "dest" : "./test1/",
+            "excludeFilePattern" : ["GMC*", "SSC*", "Tornado*", "deter*", "Fract*" , "Disagg*"],
+            "expand" : false
+        }
+    ],
+    "tasks": [
+        {
+            "name" : "test",
+            "command" : "lks -lkl1233aqwakl ./test1/",
+            "logBehavior" : "skip"
+        }
+    ],
+    "store" : [
+        {
+            "name" : "store-output",
+            "bucket" : "${BUCKET_NAME}",
+            "source" : "./test1/",
+            "dest" : "test1_out/",
+            "compress" : false,
+            "required" : true
+        }
+    ]
+}

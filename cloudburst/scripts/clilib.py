@@ -20,19 +20,8 @@ def compress_inputs(source_folder:Path = 'source.tmp/', zip_folder : Path = 'zip
             if os.path.exists(out_file):
                 os.remove(out_file)
             
-            ziplib.compress(destination_path=dir, source_path=out_file)
-
-# this script is intended to load the scripts and input data files to S3. These will be deployed to AWS servers
-def upload_code(bucket_name:str, scripts_only:bool=False):
-    # the directory to load scripts from
-    local_path = './scripts/'
-
-    print("loading code into bucket: {0}/{1} from {2}:{3}".format(bucket_name, fwlib.prefixCode, os.getcwd(), local_path))
-    s3lib.put_files(bucket_name=bucket_name, local_folder=local_path, prefix=fwlib.prefixCode)
-    if not scripts_only:
-        # load the binaries...
-        s3lib.put_files(bucket_name=bucket_name, local_folder=local_path + 'bin/', prefix=fwlib.prefixCode + 'bin/')
-
+            ziplib.compress(source_path=dir, zip_path=out_file)
+            
 # load the data into S3 
 def upload(
     bucket_name: str,
@@ -42,7 +31,7 @@ def upload(
     thread_count : int = 10):
 
     #load the bucket with files from a local directory. Exclude directory names!
-    print(f'loading input data to bucket: {bucket_name}/{prefix} from {local_folder}')
+    print(f'loading input data to bucket: s3://{bucket_name}/{prefix} from {local_folder}')
     s3lib.put_files(bucket_name=bucket_name, local_folder=local_folder, prefix=prefix, filter=filter, threads=thread_count)
 
 def expand_outputs(local_path ='./output.tmp/', output_dir ='', test:bool=False, remove_zip:bool=False):
@@ -79,8 +68,10 @@ def expand_outputs(local_path ='./output.tmp/', output_dir ='', test:bool=False,
         print("no 7z files found under: " + local_path)
 
 def get(bucket:str, prefix:str, filter:str, local_folder='output.tmp', thread_count:int=10):
-    print(f'getting data from bucket: {bucket}/{prefix} from {local_folder}')
-    s3lib.get_files(bucket_name=bucket, local_folder=local_folder, prefix=prefix, filter=filter, threads=thread_count)
+    os.makedirs(local_folder, exist_ok=True)
+
+    print(f'getting data from bucket: s3://{bucket}/{prefix} from {local_folder}')
+    s3lib.get_files(bucket_name=bucket, local_path=local_folder, prefix=prefix, filter=filter, threads=thread_count)
 
 # convert an input string e.g. comma separated list or a range to a padded list
 def convert_input_to_list(input_string:str, padding:int):
