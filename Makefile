@@ -6,7 +6,7 @@ ECR_REPO_ID=$(DEPLOYMENT_ID)
 ECR_REPO_URL=$(AWS_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 
 build:
-	docker compose build --no-cache $(DEPLOYMENT_ID)
+	docker compose build $(DEPLOYMENT_ID)
 
 run: build
 	docker compose run --rm --entrypoint bash $(DEPLOYMENT_ID)
