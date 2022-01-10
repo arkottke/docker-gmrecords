@@ -37,6 +37,7 @@ resource "aws_iam_role" "aws_batch_service_role" {
 data "aws_iam_policy_document" "assume_role_policy_batch" {
   statement {
     actions = ["sts:AssumeRole"]
+    effect = "Allow"
 
     principals {
       type        = "Service"
