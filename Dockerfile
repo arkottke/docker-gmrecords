@@ -10,7 +10,7 @@ RUN apt-get update -q && \
   rm -rf /var/lib/apt/lists/*
 
 RUN cd /root && \
-  git clone --depth 1 https://github.com/arkottke/groundmotion-processing gmprocess && \
+  git clone --depth 1 https://github.com/usgs/groundmotion-processing gmprocess && \
   cd gmprocess && \
 # conda pack doesn't allow editable packages so we need to modify the install script
   sed -i 's/pip install \(.*\) -e ./pip install \1 ./' install.sh && \
