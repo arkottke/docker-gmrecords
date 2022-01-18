@@ -1,52 +1,40 @@
 # Multistage build from: https://pythonspeed.com/articles/conda-docker-image-size/
 
-FROM continuumio/miniconda3 AS build
+FROM python:3.9-slim-bullseye
 
-RUN conda update --all
+# Install required packages
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+        gcc \
+        git \
+        libomp-dev \
+        libhdf5-dev \
+        python3-psutil \
+	; \
+	rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -q && \
-  apt-get -y install git gcc sed && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+ENV LIBRARY_PATH=/usr/local/lib:/usr/lib/llvm-11/lib
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV FONTCONFIG_PATH=/etc/fonts
 
-RUN cd /root && \
-  git clone --depth 1 https://github.com/usgs/groundmotion-processing gmprocess && \
-  cd gmprocess && \
-# conda pack doesn't allow editable packages so we need to modify the install script
-  sed -i 's/pip install \(.*\) -e ./pip install \1 ./' install.sh && \
-  bash install.sh
+# Install dependencies:
+COPY requirements.txt .
+RUN python3 -m pip install --upgrade pip; \
+    pip install wheel; \
+    pip install --no-cache-dir -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py39-linux64.txt; \
+    pip install --no-cache-dir --no-deps openquake-engine; \
+    pip install --no-cache-dir -r requirements.txt; \
+    pip install --no-cache-dir --no-deps git+git://github.com/usgs/groundmotion-processing@master#egg=gmprocess
 
-# Use conda-pack to create a standalone enviornment
-# in /venv:
-RUN conda install -c conda-forge conda-pack && \
-  conda-pack -n gmprocess -o /tmp/env.tar && \
-  mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
-  rm /tmp/env.tar
+RUN gmrecords -v
 
-# Install the host system
-FROM debian:bookworm-slim AS runtime
-
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y p7zip-full && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
-
-# Copy /venv from the previous stage:
-COPY --from=build /venv /venv
-
-# Need to use bash for source
-RUN echo "source /venv/bin/activate" >> /root/.bashrc
-SHELL ["/bin/bash", "-l", "-c"]
-
-RUN pip install boto3 jsonschema
 RUN mkdir /working
 WORKDIR /working
 
-# Copy the cloudburst framework and the data directory
+# Copy the cloudburst framework
 COPY cloudburst/scripts /opt/cloudburst
-COPY data /working
-
-ENV FONTCONFIG_PATH=/etc/fonts
 
 ENTRYPOINT source /venv/bin/activate && python3 /opt/cloudburst/fw_entrypoint.py

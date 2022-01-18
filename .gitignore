@@ -1,2 +1,6 @@
 data/dask-worker-space
 data/data
+
+cloudburst/terraform/.terraform.lock.hcl
+cloudburst/terraform/terraform.tfstate
+cloudburst/terraform/terraform.tfstate.backup

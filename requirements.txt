@@ -1,0 +1,29 @@
+# pip>=21.2
+# wheel
+
+# Install openquake and its dependencies
+# -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py39-linux64.txt
+# openquake-engine>=3.12
+
+cython>=0.29.23
+dask>=2021.8
+lxml>=4.6.1
+obspy>=1.2.1
+openpyxl>=3.0.8
+pandas>=1.0
+pyasdf>=0.7
+ruamel.yaml>=0.17.16
+schema>=0.7
+setuptools-scm>=6.3.2
+statsmodels>=0.12.2
+vcrpy>=4.1
+yapf>=0.31
+folium>=0.12.0
+
+# USGS repositories
+git+git://github.com/usgs/MapIO@master#egg=mapio
+git+git://github.com/usgs/earthquake-impact-utils@master#egg=earthquake-impact-utils
+git+git://github.com/usgs/libcomcat@master#egg=libcomcat
+git+git://github.com/usgs/ps2ff@master#egg=ps2ff
+
+# git+git://github.com/usgs/groundmotion-processing@master#egg=gmprocess

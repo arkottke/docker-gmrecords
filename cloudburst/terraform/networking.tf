@@ -21,7 +21,7 @@ resource "aws_subnet" "subnet1" {
 resource "aws_subnet" "subnet2" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.128.0/17"
-  availability_zone = "us-west-1c"
+  availability_zone = "us-west-1b"
 
   tags = {
     "Name" = "${var.deployment_name}_sub2"

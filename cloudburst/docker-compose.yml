@@ -10,7 +10,7 @@ services:
         tty: true        # docker run -t
         environment:
             - AWS_REGION=us-west-1
-            - BUCKET_NAME=
+            - BUCKET_NAME=dsgmd
             - MODE_STR=
             - LOCAL_MODE=0
             - WORK_ITEM=test1
