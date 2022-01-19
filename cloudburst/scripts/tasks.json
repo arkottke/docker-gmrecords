@@ -2,10 +2,24 @@
     "programName" : "gmrecords",
     "$schema": "tasks.schema.json",
     "itemName" : "${WORK_ITEM}",
+    "fetch": [
+        {
+          "name" : "fetch configs",
+          "bucket" : "${BUCKET_NAME}",
+          "key" : "conf",
+          "dest" : "/working/conf"
+        },
+        {
+          "name" : "fetch project config",
+          "bucket" : "${BUCKET_NAME}",
+          "key" : ".gmprocess",
+          "dest" : "/working/.gmprocess"
+        }
+    ],
     "tasks": [
         {
             "name" : "gmrecords",
-            "command" : "/working/entrypoint.sh ${WORK_ITEM}",
+            "command" : "/working/gmrecords_helper.sh ${WORK_ITEM}",
             "logBehavior" : "skip",
             "outputFolder" : "/working/data/${WORK_ITEM}/"
         }
@@ -15,7 +29,7 @@
             "name" : "store h5 output",
             "bucket" : "${BUCKET_NAME}",
             "source" : "data/${WORK_ITEM}/workspace.h5",
-            "dest" : "output_gmrecords/${WORK_ITEM}/workspace.h5",
+            "dest" : "data/${WORK_ITEM}/workspace.h5",
             "compress" : false
         }
     ]

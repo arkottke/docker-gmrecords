@@ -33,6 +33,7 @@ RUN set -eux; \
         python3-gdal \
         python3-h5py \
         python3-idna \
+        python3-jsonschema \
         python3-kiwisolver \
         python3-lxml \
         python3-matplotlib \
@@ -74,12 +75,16 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     pip install --no-cache-dir --no-deps git+git://github.com/usgs/groundmotion-processing@master#egg=gmprocess
 
+# Update the font cache for matplotlib
+RUN python3 -c "from matplotlib import font_manager; font_manager._rebuild()"
+
 RUN gmrecords -v
 
-RUN mkdir /working
+RUN mkdir -p /working/data
 WORKDIR /working
 
-# Copy the cloudburst framework
+# Copy the cloudburst framework and helper script
 COPY cloudburst/scripts /opt/cloudburst
+COPY gmrecords_helper.sh /working
 
-ENTRYPOINT source /venv/bin/activate && python3 /opt/cloudburst/fw_entrypoint.py
+ENTRYPOINT python3 /opt/cloudburst/fw_entrypoint.py

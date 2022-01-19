@@ -11,8 +11,7 @@ services:
         environment:
             - WORK_ITEM=nc73654060
             - AWS_REGION=us-west-1
-            - BUCKET_NAME=test-bruceh
+            - BUCKET_NAME=dsgmd
         volumes:
             - ~/.aws/credentials:/root/.aws/credentials:ro
-            - ./data:/working/data
 
