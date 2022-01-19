@@ -25,9 +25,9 @@ echo ">> `date`: Computing station metrics $EID"
 gmrecords compute_station_metrics -e $EID -o -l default
 echo ">> `date`: Computing waveform metrics $EID"
 gmrecords compute_waveform_metrics -e $EID -o -l default
-echo ">> `date`: Generating report $EID"
 
-gmrecords report -e $EID -l default
+# echo ">> `date`: Generating report $EID"
+# gmrecords report -e $EID -l default
 # Remove the plots and latex files created by the report generation as these
 # are stored in the report, and re-created eachtime
-rm -rf data/$EID/plots data/$EID/*.{aux,tex,log,png}
+# rm -rf data/$EID/plots data/$EID/*.{aux,tex,log,png}
