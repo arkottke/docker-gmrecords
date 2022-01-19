@@ -56,7 +56,7 @@ RUN set -eux; \
         python3-setuptools-scm \
         python3-shapely \
         python3-six \
-        python3-sqlalchmey \
+        python3-sqlalchemy \
         python3-sqlparse \
         python3-statsmodels \
         python3-toml \
