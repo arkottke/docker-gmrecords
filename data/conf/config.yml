@@ -1,5 +1,9 @@
 # -----------------------------------------------------------------------------
 # This section is for configuring data fetching routines.
+user:
+  name: Albert Kottke
+  email: albert.kottke@gmail.com
+
 fetchers:
     CESMDFetcher:
         # CESMD requires an email, register yours by
@@ -9,18 +13,18 @@ fetchers:
         process_type: raw
         station_type: Ground
         # define the distance search radius (km)
-        eq_radius : 10
+        eq_radius : 10.0
         # define the time search threshokd (sec)
-        eq_dt : 10
+        eq_dt : 10.0
         # station search radius (km)
-        station_radius: 300
+        station_radius: 300.0
     FDSNFetcher:
         # search radius in decimal degrees. 3 provides about 300 km
-        radius : 3
+        radius : 3.0
         # seconds before arrival time
-        time_before : 30
+        time_before : 30.0
         # seconds after arrival time
-        time_after : 420
+        time_after : 420.0
         channels : ["BH?", "HH?", "BN?", "HN?"] # only get strong motion and high-gain channels
         # channels : ["?N?"] # only get strong motion/broadband accelerometer data
 
@@ -62,7 +66,6 @@ fetchers:
         # For each of the FDSN providers, a username and password
         # can be provided. This section does not need to contain all of the
         # providers, just the ones you want to give a username and password.
-
         # Example:
         # IRIS:
         #     user: USERNAME
@@ -73,12 +76,12 @@ fetchers:
 # Options for readers
 read:
     # Look for StationXML files in this directory instead of the `<event>/raw`
-    # directory. StationXML file names must follow the convension of 
+    # directory. StationXML file names must follow the convension of
     # `<network>.<station>.xml`.
     metadata_directory: None
 
     # Resampling rate if times are unevenly spaced
-    resample_rate: 200
+    resample_rate: 200.0
 
     # SAC header doesn't include units (!) and is generally assumed to be:
     #     nm/s/s for acceleration
@@ -118,7 +121,7 @@ windows:
         method: model
         vmin: 1.0
         # Minimum duration in sec for use with 'vmin' option.
-        floor: 120
+        floor: 120.0
         # Duration model
         model: AS16
         # Number of standard deviations; if epsilon is 1.0, then the signal
@@ -298,7 +301,7 @@ processing:
         # configured in the windows section.
 
         # Optionally, can specify 'sec_before_split' which shifts the start
-        # time of the signal window (relative to the estimated p-wave arrival). 
+        # time of the signal window (relative to the estimated p-wave arrival).
         # If set to "Null" then the beginning of the signal window will be
         # unchanged.
         sec_before_split: 2.0
@@ -320,7 +323,7 @@ processing:
         # determined with 'corner_frequencies' section.
         filter_order: 5
         number_of_passes: 2
-    - detrend:    
+    - detrend:
         detrending_method: pre
 
     - detrend:
@@ -384,7 +387,7 @@ processing:
         duration: 5.0
         # Max ratio of the absolute velocity in the tail to the full trace.
         max_vel_ratio: 0.3
-        # Max ratio of the absolute displacement in the tail to the full 
+        # Max ratio of the absolute displacement in the tail to the full
         # trace.
         max_dis_ratio: 0.6
 
@@ -416,7 +419,7 @@ duplicate:
     # This section is for handling duplicate data when creating a StreamCollection
 
     # Maximum distance tolerance (in m) for duplicate data
-    max_dist_tolerance: 500
+    max_dist_tolerance: 500.0
 
     # List of preferences (in order) for handling duplicate data.
     preference_order: ['process_level', 'source_format', 'starttime', 'npts',
@@ -473,8 +476,8 @@ metrics:
         # Parameters defining an array of periods
         # syntax is the same as that used for numpy linspace and logspace
         # start (first value), stop (last value), num (number of values)
-        start: -2
-        stop: 1
+        start: -2.0
+        stop: 1.0
         num: 91
         # Valid spacing: linspace, logspace
         spacing: logspace
@@ -483,28 +486,10 @@ metrics:
         use_array: True
         # Defines a list of user defined periods that are not
         # predefined by the array of periods
-        # defined_periods:
-        #   - 0.01
-        #   - 0.02
-        #   - 0.03
-        #   - 0.05
-        #   - 0.075
-        #   - 0.1
-        #   - 0.15
-        #   - 0.2
-        #   - 0.25
-        #   - 0.3
-        #   - 0.4
-        #   - 0.5
-        #   - 0.75
-        #   - 1.0
-        #   - 1.5
-        #   - 2.0
-        #   - 3.0
-        #   - 4.0
-        #   - 5.0
-        #   - 7.5
-        #   - 10.0
+        defined_periods:
+          - 0.075
+          - 0.75
+          - 7.5
   fas:
       smoothing: konno_ohmachi
       bandwidth: 40.0
@@ -513,8 +498,8 @@ metrics:
         # Parameters defining an array of periods
         # syntax is the same as that used for numpy linspace and logspace
         # start (first value), stop (last value), num (number of values)
-        start: -1
-        stop: 2
+        start: -1.0
+        stop: 2.0
         num: 91
         # Valid spacing: linspace, logspace
         spacing: logspace
@@ -523,8 +508,8 @@ metrics:
         use_array: True
         # A list of user defined periods that are not
         # predefined by the array of periods.
-        # defined_periods:
-        # - 0.3
+        defined_periods:
+          - 0.3
   duration:
       intervals:
           - 5-75
@@ -542,6 +527,12 @@ metrics:
 #         column_header: example_column_header
 #         readme_entry: example_readme_entry
 #         units: example_units
+
+# This section is for options for integration method
+integration:
+    # method can be one of "frequency domain", "time_domain_0init"
+    # "time_domain_0init_0mean"
+    method: "frequency_domain"
 
 # -----------------------------------------------------------------------------
 # This section is for options for phase pickers
@@ -592,7 +583,7 @@ pickers:
     # Options for obspy.signal.trigger.pk_baer()
     baer:
         # If dtime exceeds tdownmax, the trigger is examined for validity
-        tdownmax: 20
+        tdownmax: 20.0
 
         # Minimum number of samples for itrm to be accepted as a pick
         tupevent: 60
@@ -607,7 +598,7 @@ pickers:
         preset_len: 100
 
         # Time interval for which the maximum amplitude is evaluated
-        p_dur: 100
+        p_dur: 100.0
 
     kalkan:
         # undamped natural period in second (default is 0.01 for
@@ -633,7 +624,7 @@ pickers:
     # TODO: Document these options
     power:
         highpass: 1.4
-        lowpass: 6
+        lowpass: 6.0
         order: 3
         sta: 3.0
         sta2: 3.0
