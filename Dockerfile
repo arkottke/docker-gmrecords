@@ -75,8 +75,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     pip install --no-cache-dir --no-deps git+git://github.com/usgs/groundmotion-processing@master#egg=gmprocess
 
-# Update the font cache for matplotlib
-RUN python3 -c "from matplotlib import font_manager; font_manager._rebuild()"
+# Import matplotlib the first time to build the font cache.
+RUN MPLBACKEND=Agg python3 -c "import matplotlib.pyplot"
 
 RUN gmrecords -v
 
