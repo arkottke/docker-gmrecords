@@ -3,6 +3,7 @@
 set -euo pipefail
 
 EID=$1
+LABEL="processed2"
 
 cd /working
 
@@ -20,11 +21,11 @@ if [ ! -f "data/$EID/workspace.h5" ]; then
 fi
 
 echo ">> `date`: Processing $EID"
-gmrecords process -e $EID -l default
+gmrecords process -e $EID -l $LABEL
 echo ">> `date`: Computing station metrics $EID"
-gmrecords compute_station_metrics -e $EID -o -l default
+gmrecords compute_station_metrics -e $EID -o -l $LABEL
 echo ">> `date`: Computing waveform metrics $EID"
-gmrecords compute_waveform_metrics -e $EID -o -l default
+gmrecords compute_waveform_metrics -e $EID -o -l $LABEL
 
 # echo ">> `date`: Generating report $EID"
 # gmrecords report -e $EID -l default
