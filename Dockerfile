@@ -73,7 +73,7 @@ ENV FONTCONFIG_PATH=/etc/fonts
 # Install dependencies. Here we prevent groundmotion-processing from looking for dependencies during the installation.
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
-    pip install --no-cache-dir --no-deps git+git://github.com/usgs/groundmotion-processing@master#egg=gmprocess
+    pip install --no-cache-dir --no-deps git+https://github.com/usgs/groundmotion-processing@master#egg=gmprocess
 
 # Import matplotlib the first time to build the font cache.
 RUN MPLBACKEND=Agg python3 -c "import matplotlib.pyplot"
