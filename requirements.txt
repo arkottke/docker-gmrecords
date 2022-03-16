@@ -6,7 +6,7 @@ vcrpy
 pyzmq
 
 # USGS repositories
-git+git://github.com/usgs/MapIO@master#egg=mapio
-git+git://github.com/usgs/earthquake-impact-utils@master#egg=earthquake-impact-utils
-git+git://github.com/usgs/libcomcat@master#egg=libcomcat
-git+git://github.com/usgs/ps2ff@master#egg=ps2ff
+git+https://github.com/usgs/MapIO@master#egg=mapio
+git+https://github.com/usgs/earthquake-impact-utils@master#egg=earthquake-impact-utils
+git+https://github.com/usgs/libcomcat@master#egg=libcomcat
+git+https://github.com/usgs/ps2ff@master#egg=ps2ff
