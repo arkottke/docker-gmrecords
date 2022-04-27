@@ -3,7 +3,7 @@
 set -euo pipefail
 
 EID=$1
-LABEL="processed2"
+LABEL="default"
 
 cd /working
 
