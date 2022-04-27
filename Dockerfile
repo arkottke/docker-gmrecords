@@ -1,12 +1,10 @@
 # Multistage build from: https://pythonspeed.com/articles/conda-docker-image-size/
 
-FROM debian:testing
+FROM debian:stable
 
 # Install required packages
 RUN set -eux; \
 	apt-get update; \
-    yes | dpkg --remove --force-all libpython3.10-minimal libpython3.10-stdlib; \
-    apt-get install -y libpython3.10-minimal libpython3.10-stdlib; \
 	apt-get install -y --no-install-recommends \
         cython3 \
         gcc \
