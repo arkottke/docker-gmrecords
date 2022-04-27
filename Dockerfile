@@ -64,6 +64,7 @@ RUN set -eux; \
         python3-urllib3 \
         python3-wheel \
         python3-yapf \
+        vim \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -72,8 +73,15 @@ ENV FONTCONFIG_PATH=/etc/fonts
 
 # Install dependencies. Here we prevent groundmotion-processing from looking for dependencies during the installation.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    pip install --no-cache-dir --no-deps git+https://github.com/usgs/groundmotion-processing@master#egg=gmprocess
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN cd /tmp/ && \
+    git clone https://github.com/usgs/groundmotion-processing.git gmprocess && \
+    cd gmprocess && \
+    sed  -i '/libraries.append("omp")/d' setup.py && \
+    pip install --no-cache-dir --no-deps . && \
+    cd && \
+    rm -rf /tmp/*
 
 # Import matplotlib the first time to build the font cache.
 RUN MPLBACKEND=Agg python3 -c "import matplotlib.pyplot"
