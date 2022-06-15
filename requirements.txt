@@ -7,6 +7,6 @@ pyzmq
 
 # USGS repositories
 git+https://github.com/usgs/MapIO@master#egg=mapio
-git+https://github.com/usgs/earthquake-impact-utils@master#egg=earthquake-impact-utils
+git+https://github.com/usgs/earthquake-impact-utils@main#egg=earthquake-impact-utils
 git+https://github.com/usgs/libcomcat@master#egg=libcomcat
 git+https://github.com/usgs/ps2ff@master#egg=ps2ff
