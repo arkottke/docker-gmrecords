@@ -62,7 +62,7 @@ resource "aws_batch_job_definition" "aws_jobdef" {
       },
       "resourceRequirements": [
         {"type": "VCPU", "value": "1"},
-        {"type": "MEMORY", "value": "4096"}
+        {"type": "MEMORY", "value": "6144"}
       ],
       "executionRoleArn": "${aws_iam_role.ecs_task_exec_role.arn}",
       "jobRoleArn": "${aws_iam_role.ecs_task_exec_role.arn}",
@@ -71,7 +71,7 @@ resource "aws_batch_job_definition" "aws_jobdef" {
         {"name": "BUCKET_NAME", "value": ""},
         {"name": "MODE_STR", "value": ""}
       ],
-      "networkConfiguration": { 
+      "networkConfiguration": {
          "assignPublicIp": "ENABLED"
       },
       "logConfiguration": {
