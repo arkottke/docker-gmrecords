@@ -78,7 +78,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN cd /tmp/ && \
     git clone https://github.com/usgs/groundmotion-processing.git gmprocess && \
     cd gmprocess && \
-    sed  -i '/libraries.append("omp")/d' setup.py && \
     pip install --no-cache-dir --no-deps . && \
     cd && \
     rm -rf /tmp/*
