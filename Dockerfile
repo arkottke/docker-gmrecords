@@ -76,7 +76,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN cd /tmp/ && \
-    git clone https://github.com/usgs/groundmotion-processing.git gmprocess && \
+    git clone https://code.usgs.gov/ghsc/esi/groundmotion-processing.git gmprocess && \
     cd gmprocess && \
     pip install --no-cache-dir --no-deps . && \
     cd && \
