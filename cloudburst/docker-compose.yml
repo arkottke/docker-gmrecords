@@ -13,7 +13,7 @@ services:
             - BUCKET_NAME=dsgmd
             - MODE_STR=
             - LOCAL_MODE=0
-            - WORK_ITEM=test1
-            # overrides default - TASKS_PATH=/opt/pge-fw/tasks-example1.json
+            - WORK_ITEM=nc73619336
+              # - TASKS_PATH=/opt/cloudburst/tasks-export.json
         volumes:
             - ~/.aws/credentials:/root/.aws/credentials:ro
