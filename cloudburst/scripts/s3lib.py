@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 # cloudburst framework - Bruce Hearn 2021 bruce.hearn@gmail.com
 
-import boto3, os, re
+import boto3
+import os
+import re
 import concurrent.futures
-from functools import partial
 from pathlib import Path
 
 
@@ -105,7 +106,7 @@ def put_files(
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
             for file in Path(local_folder).rglob(filter):
-                if file.is_file() and not "DS_Store" in file.name:
+                if file.is_file() and "DS_Store" not in file.name:
                     if str(file).startswith(str(local_folder)):
                         tmp = str(file)[len(str(local_folder)) :]
                         if len(str(prefix)) > 0 and prefix[len(str(prefix)) - 1] != "/":
