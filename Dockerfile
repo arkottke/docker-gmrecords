@@ -44,7 +44,4 @@ WORKDIR /working
 # Copy the cloudburst framework and helper script
 COPY cloudburst/scripts /opt/cloudburst
 
-COPY clean_workspace.py /working
-COPY gmrecords_helper.sh /working
-
 ENTRYPOINT python /opt/cloudburst/fw_entrypoint.py
