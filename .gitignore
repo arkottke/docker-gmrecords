@@ -1,5 +1,6 @@
-data/dask-worker-space
-data/data
+.python-version
+
+volumes/*
 
 cloudburst/terraform/.terraform.lock.hcl
 cloudburst/terraform/terraform.tfstate
