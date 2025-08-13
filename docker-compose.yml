@@ -1,4 +1,3 @@
-version: "3"
 services:
   gmrecords:
     build:
@@ -9,10 +8,9 @@ services:
     stdin_open: true # docker run -i
     tty: true # docker run -t
     environment:
-      - WORK_ITEM=nc73564200
-      - AWS_REGION=us-west-1
-      - BUCKET_NAME=pge-dcpp-gmd
-      - TASKS_PATH=/opt/cloudburst/tasks.json
+      - WORK_ITEM=nc73559265
+      - AWS_REGION=us-west-2
+      - BUCKET_NAME=project-2025-gmprocess-gmd
+      - TASKS_PATH=/opt/cloudburst/tasks-dl.json
     volumes:
       - ~/.aws/credentials:/root/.aws/credentials:ro
-      - ./volumes/data:/working/data

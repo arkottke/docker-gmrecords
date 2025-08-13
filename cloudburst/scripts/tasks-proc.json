@@ -1,0 +1,77 @@
+{
+	"programName": "gmrecords",
+	"$schema": "tasks.schema.json",
+	"itemName": "${WORK_ITEM}",
+	"fetch": [
+		{
+			"name": "fetch configs",
+			"bucket": "${BUCKET_NAME}",
+			"key": "database/conf",
+			"dest": "/working/conf",
+			"exitOnError": true
+		},
+		{
+			"name": "fetch project config",
+			"bucket": "${BUCKET_NAME}",
+			"key": "database/.gmprocess",
+			"dest": "/working/.gmprocess",
+			"exitOnError": true
+		},
+		{
+			"name": "fetch workspace file",
+			"bucket": "${BUCKET_NAME}",
+			"key": "database/downloaded/${WORK_ITEM}/workspace.h5",
+			"dest": "/working/data/${WORK_ITEM}/workspace.h5",
+			"exitOnError": true
+		}
+	],
+	"tasks": [
+		{
+			"name": "gmrecords process_waveforms",
+			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default process_waveforms"
+		},
+		{
+			"name": "gmrecords compute_station_metrics",
+			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default compute_station_metrics"
+		},
+		{
+			"name": "gmrecords compute_waveform_metrics",
+			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default compute_waveform_metrics"
+		},
+		{
+			"name": "gmrecords mtables",
+			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default mtables"
+		},
+		{
+			"name": "compress mtables",
+			"command": "cd data && tar -czf \"$EID/mtables-$EID.tar.gz\" *.csv",
+			"exitOnError": false
+		}
+	],
+	"store": [
+		{
+			"name": "store log output",
+			"bucket": "${BUCKET_NAME}",
+			"source": "/working/${WORK_ITEM}.log",
+			"dest": "database/data/${WORK_ITEM}/process.log",
+			"compress": false,
+			"exitOnError": true
+		},
+		{
+			"name": "store h5 output",
+			"bucket": "${BUCKET_NAME}",
+			"source": "/working/data/${WORK_ITEM}/workspace.h5",
+			"dest": "database/data/${WORK_ITEM}/workspace.h5",
+			"compress": false,
+			"exitOnError": true
+		},
+		{
+			"name": "store mtables",
+			"bucket": "${BUCKET_NAME}",
+			"source": "/working/data/${WORK_ITEM}/mtables-${WORK_ITEM}.tar.gz",
+			"dest": "database/data/${WORK_ITEM}/mtables-${WORK_ITEM}.tar.gz",
+			"compress": false,
+			"exitOnError": true
+		}
+	]
+}

@@ -1,6 +1,6 @@
 DEPLOYMENT_ID=cloudburst1
 AWS_ID=<your_aws_ID_here>
-AWS_REGION=us-west-1
+AWS_REGION=us-west-2
 
 ECR_REPO_ID=$(DEPLOYMENT_ID)
 ECR_REPO_URL=$(AWS_ID).dkr.ecr.$(AWS_REGION).amazonaws.com

@@ -6,100 +6,54 @@
     {
       "name": "fetch configs",
       "bucket": "${BUCKET_NAME}",
-      "key": "conf",
-      "dest": "/working/conf",
+      "key": "database/conf",
+      "dest": "/working/database/conf",
       "exitOnError": true
     },
     {
       "name": "fetch project config",
       "bucket": "${BUCKET_NAME}",
-      "key": ".gmprocess",
-      "dest": "/working/.gmprocess",
+      "key": "database/.gmprocess",
+      "dest": "/working/database/.gmprocess",
       "exitOnError": true
     },
     {
-      "name": "fetch raw files",
+      "name": "fetch workspace file",
       "bucket": "${BUCKET_NAME}",
-      "key": "metadata",
-      "dest": "/working/metadata/",
-      "exitOnError": false
-    },
-    {
-      "name": "fetch raw files",
-      "bucket": "${BUCKET_NAME}",
-      "key": "data/${WORK_ITEM}/raw",
-      "dest": "/working/data/${WORK_ITEM}/raw",
-      "exitOnError": false
-    },
-    {
-      "name": "fetch rupture file",
-      "bucket": "${BUCKET_NAME}",
-      "key": "data/${WORK_ITEM}/rupture.json",
-      "dest": "/working/data/${WORK_ITEM}/rupture.json",
-      "exitOnError": false
-    },
-    {
-      "name": "fetch event file",
-      "bucket": "${BUCKET_NAME}",
-      "key": "data/${WORK_ITEM}/event.json",
-      "dest": "/working/data/${WORK_ITEM}/event.json",
+      "key": "database/downloaded/downloaded/${WORK_ITEM}/workspace.h5",
+      "dest": "/working/database/downloaded/${WORK_ITEM}/workspace.h5",
       "exitOnError": false
     },
     {
       "name": "fetch helper file",
       "bucket": "${BUCKET_NAME}",
-      "key": "scripts/gmrecords_helper.sh",
-      "dest": "/working/gmrecords_helper.sh",
+      "key": "scripts/gmrecords-helper.sh",
+      "dest": "/working/scripts/gmrecords-helper.sh",
       "exitOnError": true
     }
   ],
   "tasks": [
     {
       "name": "gmrecords",
-      "command": "/working/gmrecords_helper.sh ${WORK_ITEM}",
-      "outputFolder": "/working/data/${WORK_ITEM}/"
+      "command": "cd /working/scripts && zsh gmrecords-helper.sh -p -n0 ${WORK_ITEM}"
     }
   ],
   "store": [
     {
       "name": "store h5 output",
       "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/workspace.h5",
-      "dest": "data/${WORK_ITEM}/workspace.h5",
+      "source": "/working/database/data/${WORK_ITEM}/workspace.h5",
+      "dest": "database/data/${WORK_ITEM}/workspace.h5",
       "compress": false,
       "exitOnError": true
     },
     {
       "name": "store datatables",
       "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/datatables.7z",
-      "dest": "data/${WORK_ITEM}/datatables.7z",
+      "source": "/working/database/data/${WORK_ITEM}/mtables-${WORK_ITEM}.tar.gz",
+      "dest": "database/data/${WORK_ITEM}/mtables-${WORK_ITEM}.tar.gz",
       "compress": false,
       "exitOnError": true
-    },
-    {
-      "name": "store report.pdf",
-      "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/report.pdf",
-      "dest": "data/${WORK_ITEM}/report.pdf",
-      "compress": false,
-      "exitOnError": false
-    },
-    {
-      "name": "store event.json",
-      "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/event.json",
-      "dest": "data/${WORK_ITEM}/event.json",
-      "compress": false,
-      "exitOnError": false
-    },
-    {
-      "name": "store rupture.json",
-      "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/rupture.json",
-      "dest": "data/${WORK_ITEM}/rupture.json",
-      "compress": false,
-      "exitOnError": false
     }
   ]
 }

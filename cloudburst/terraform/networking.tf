@@ -12,16 +12,17 @@ resource "aws_vpc" "vpc" {
 resource "aws_subnet" "subnet1" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.0.0/17"
-  availability_zone = "us-west-1a"
+  availability_zone = local.azs[0]
 
   tags = {
     "Name" = "${var.deployment_name}_sub1"
   }
 }
+
 resource "aws_subnet" "subnet2" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.128.0/17"
-  availability_zone = "us-west-1b"
+  availability_zone = local.azs[1]
 
   tags = {
     "Name" = "${var.deployment_name}_sub2"

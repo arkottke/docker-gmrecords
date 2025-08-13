@@ -1,6 +1,6 @@
 DEPLOYMENT_ID=gmrecords
 AWS_ID=939369860757
-AWS_REGION=us-west-1
+AWS_REGION=us-west-2
 
 ECR_REPO_ID=$(DEPLOYMENT_ID)
 ECR_REPO_URL=$(AWS_ID).dkr.ecr.$(AWS_REGION).amazonaws.com

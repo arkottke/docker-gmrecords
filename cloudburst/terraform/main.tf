@@ -1,21 +1,22 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.27"
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = "gmrecords"
+      Environment = var.deployment_name
+      ManagedBy   = "Terraform"
     }
   }
-
-  required_version = ">= 0.14.9"
-}
-
-provider "aws" {
-  profile = "default"
-  region  = var.aws_region
 }
 
 data "aws_caller_identity" "current" {}
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 locals {
   account_id = data.aws_caller_identity.current.account_id
+  azs        = slice(data.aws_availability_zones.available.names, 0, 2)
 }
