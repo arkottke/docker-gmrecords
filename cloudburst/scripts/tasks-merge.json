@@ -1,0 +1,13 @@
+{
+	"programName": "gmrecords",
+	"$schema": "tasks.schema.json",
+	"itemName": "${WORK_ITEM}",
+	"fetch": [],
+	"tasks": [
+		{
+			"name": "running merge_mtables.sh",
+			"command": "bash merge_mtables.sh"
+		}
+	],
+	"store": []
+}

@@ -5,7 +5,6 @@ boto3
 jsonschema
 rdflib
 gmprocess
-awscliv2
 
 # USGS repositories
 # git+https://github.com/usgs/MapIO@master#egg=mapio

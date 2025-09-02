@@ -5,6 +5,7 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 	hdf5-tools \
+	awscli \
 	p7zip-full \
 	vim \
 	wget \
@@ -14,6 +15,10 @@ RUN set -eux; \
 
 ENV LIBRARY_PATH=/usr/local/lib:/usr/lib/llvm-13/lib
 ENV FONTCONFIG_PATH=/etc/fonts
+
+# Install DuckDB
+RUN curl https://install.duckdb.org | sh
+ENV PATH="/root/.duckdb/cli/latest:${PATH}"
 
 # Install a miminum tex environment
 # https://yihui.org/tinytex/
@@ -46,5 +51,9 @@ WORKDIR /working
 
 # Copy the cloudburst framework scripts
 COPY cloudburst/scripts /opt/cloudburst
+
+COPY contrib/download.sh /working/download.sh
+COPY contrib/process.sh /working/process.sh
+COPY contrib/merge_mtables.sh /working/merge_mtables.sh
 
 ENTRYPOINT python /opt/cloudburst/fw_entrypoint.py

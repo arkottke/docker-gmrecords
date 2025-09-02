@@ -27,25 +27,8 @@
 	],
 	"tasks": [
 		{
-			"name": "gmrecords process_waveforms",
-			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default process_waveforms"
-		},
-		{
-			"name": "gmrecords compute_station_metrics",
-			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default compute_station_metrics"
-		},
-		{
-			"name": "gmrecords compute_waveform_metrics",
-			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default compute_waveform_metrics"
-		},
-		{
-			"name": "gmrecords mtables",
-			"command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} -n2 --label default mtables"
-		},
-		{
-			"name": "compress mtables",
-			"command": "cd data && tar -czf \"$EID/mtables-$EID.tar.gz\" *.csv",
-			"exitOnError": false
+			"name": "running process.sh",
+			"command": "bash process.sh ${WORK_ITEM}"
 		}
 	],
 	"store": [

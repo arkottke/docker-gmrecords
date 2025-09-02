@@ -8,9 +8,9 @@ services:
     stdin_open: true # docker run -i
     tty: true # docker run -t
     environment:
-      - WORK_ITEM=nc73559265
+      - WORK_ITEM=usp000j3vq
       - AWS_REGION=us-west-2
       - BUCKET_NAME=project-2025-gmprocess-gmd
-      - TASKS_PATH=/opt/cloudburst/tasks-dl.json
+      - TASKS_PATH=/opt/cloudburst/tasks-merge.json
     volumes:
       - ~/.aws/credentials:/root/.aws/credentials:ro

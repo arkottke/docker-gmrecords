@@ -1,49 +1,45 @@
 {
-  "programName": "gmrecords",
-  "$schema": "tasks.schema.json",
-  "itemName": "${WORK_ITEM}",
-  "fetch": [
-    {
-      "name": "fetch configs",
-      "bucket": "${BUCKET_NAME}",
-      "key": "database/conf",
-      "dest": "/working/conf",
-      "exitOnError": true
-    },
-    {
-      "name": "fetch project config",
-      "bucket": "${BUCKET_NAME}",
-      "key": "database/.gmprocess",
-      "dest": "/working/.gmprocess",
-      "exitOnError": true
-    }
-  ],
-  "tasks": [
-    {
-      "name": "gmrecords download",
-      "command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} --label default download"
-    },
-    {
-      "name": "gmrecords assemble",
-      "command": "gmrecords --log ${WORK_ITEM}.log -e ${WORK_ITEM} --label default assemble"
-    }
-  ],
-  "store": [
-    {
-      "name": "store h5 output",
-      "bucket": "${BUCKET_NAME}",
-      "source": "/working/data/${WORK_ITEM}/workspace.h5",
-      "dest": "database/downloaded/${WORK_ITEM}/workspace.h5",
-      "compress": false,
-      "exitOnError": true
-    },
-    {
-      "name": "store log output",
-      "bucket": "${BUCKET_NAME}",
-      "source": "/working/${WORK_ITEM}.log",
-      "dest": "database/data/${WORK_ITEM}/download.log",
-      "compress": false,
-      "exitOnError": true
-    }
-  ]
+	"programName": "gmrecords",
+	"$schema": "tasks.schema.json",
+	"itemName": "${WORK_ITEM}",
+	"fetch": [
+		{
+			"name": "fetch configs",
+			"bucket": "${BUCKET_NAME}",
+			"key": "database/conf",
+			"dest": "/working/conf",
+			"exitOnError": true
+		},
+		{
+			"name": "fetch project config",
+			"bucket": "${BUCKET_NAME}",
+			"key": "database/.gmprocess",
+			"dest": "/working/.gmprocess",
+			"exitOnError": true
+		}
+	],
+	"tasks": [
+		{
+			"name": "running download.sh",
+			"command": "bash download.sh ${WORK_ITEM}"
+		}
+	],
+	"store": [
+		{
+			"name": "store h5 output",
+			"bucket": "${BUCKET_NAME}",
+			"source": "/working/data/${WORK_ITEM}/workspace.h5",
+			"dest": "database/downloaded/${WORK_ITEM}/workspace.h5",
+			"compress": false,
+			"exitOnError": true
+		},
+		{
+			"name": "store log output",
+			"bucket": "${BUCKET_NAME}",
+			"source": "/working/${WORK_ITEM}.log",
+			"dest": "database/data/${WORK_ITEM}/download.log",
+			"compress": false,
+			"exitOnError": true
+		}
+	]
 }
